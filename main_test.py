@@ -7,14 +7,9 @@ from fit_predict_categorical_encoding import fit_predict_categorical_encoding
 # Parameters ##################################################################
 
 datasets = [
-    'house_prices',
-    'adult',
-    #'indultos_espana',
-    #'dating_profiles',
-    #'intrusion_detection',
-    #'cacao_flavors',
-    'california_housing',
-    #'house_sales',
+    #'adult',
+    #'medical_charge',
+    'employee_salaries',
 ]
 
 n_jobs = 20
@@ -22,8 +17,7 @@ n_splits = 20
 test_size = 1./3
 str_preprocess = True
 n_components = None
-# results_path = os.path.join('results', 'jmlr2018_3')
-results = 'results'
+results_path = os.path.join('results', 'target_encoder_benchmarks')
 
 classifiers = [
     # 'GradientBoosting',

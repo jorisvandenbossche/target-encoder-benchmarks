@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from constants import sample_seed
 
 
-CE_HOME = os.environ.get('CE_HOME')
+BENCHMARK_HOME = os.environ.get('BENCHMARK_HOME', '.')
 
 
 def preprocess_data(df, cols):
@@ -27,13 +27,14 @@ def preprocess_data(df, cols):
 
 
 def get_data_folder():
-    hostname = socket.gethostname()
-    if hostname in ['drago', 'drago2', 'drago3']:
-        data_folder = '/storage/store/work/pcerda/data'
-    elif hostname in ['paradox', 'paradigm', 'parametric', 'parabolic']:
-        data_folder = '/storage/local/pcerda/data'
-    else:
-        data_folder = os.path.join(CE_HOME, 'data')
+    # hostname = socket.gethostname()
+    # if hostname in ['drago', 'drago2', 'drago3']:
+    #     data_folder = '/storage/store/work/pcerda/data'
+    # elif hostname in ['paradox', 'paradigm', 'parametric', 'parabolic']:
+    #     data_folder = '/storage/local/pcerda/data'
+    # else:
+    #     data_folder = os.path.join(CE_HOME, 'data')
+    data_folder = os.path.join(BENCHMARK_HOME, 'data')
     return data_folder
 
 
@@ -109,10 +110,10 @@ class Data:
         if name == 'medical_charge':
             '''Source: BigML'''
             data_path = os.path.join(get_data_folder(),
-                                     'bigml/MedicalProviderChargeInpatient')
+                                     'medical_charge')
             create_folder(data_path, 'output/results')
             data_file = os.path.join(data_path, 'raw',
-                                     'MedicalProviderChargeInpatient.csv')
+                                     'Medicare_Provider_Charge_Inpatient_DRG100_FY2011.csv')
 
         if name == 'road_safety':
             '''Source: https://data.gov.uk/dataset/road-accidents-safety-data
@@ -162,7 +163,7 @@ class Data:
             data_path = os.path.join(get_data_folder(), 'employee_salaries')
             create_folder(data_path, 'output/results')
             data_file = os.path.join(data_path, 'raw',
-                                     'Employee_Salaries_-_2016.csv')
+                                     'rows.csv')
 
         if name == 'product_relevance':
             '''Source: '''
@@ -571,26 +572,40 @@ class Data:
             self.df = pd.read_csv(self.file)
             # print_unique_values(df)
             self.col_action = {
-                'State': 'OneHotEncoderDense',
-                'Total population': 'Delete',
-                'Median age': 'Delete',
-                '% BachelorsDeg or higher': 'Delete',
-                'Unemployment rate': 'Delete',
-                'Per capita income': 'Delete',
-                'Total households': 'Delete',
-                'Average household size': 'Delete',
-                '% Owner occupied housing': 'Delete',
-                '% Renter occupied housing': 'Delete',
-                '% Vacant housing': 'Delete',
-                'Median home value': 'Delete',
-                'Population growth 2010 to 2015 annual': 'Delete',
-                'House hold growth 2010 to 2015 annual': 'Delete',
-                'Per capita income growth 2010 to 2015 annual': 'Delete',
-                '2012 state winner': 'Delete',
-                'Medical procedure': 'Special',
-                'Total Discharges': 'Delete',
+                'DRG Definition': 'Special',
+                'Provider Id': 'Delete',
+                'Provider Name': 'Delete',
+                'Provider Street Address': 'Delete',
+                'Provider City': 'Delete',
+                'Provider State': 'OneHotEncoderDense',
+                'Provider Zip Code': 'Delete', 
+                'Hospital Referral Region (HRR) Description': 'Delete',
+                'Total Discharges': 'Delete', 
                 'Average Covered Charges': 'Numerical',
-                'Average Total Payments': 'y'}
+                'Average Total Payments': 'y',
+                'Average Medicare Payments': 'Delete'
+            }
+            # self.col_action = {
+            #     'State': 'OneHotEncoderDense',
+            #     'Total population': 'Delete',
+            #     'Median age': 'Delete',
+            #     '% BachelorsDeg or higher': 'Delete',
+            #     'Unemployment rate': 'Delete',
+            #     'Per capita income': 'Delete',
+            #     'Total households': 'Delete',
+            #     'Average household size': 'Delete',
+            #     '% Owner occupied housing': 'Delete',
+            #     '% Renter occupied housing': 'Delete',
+            #     '% Vacant housing': 'Delete',
+            #     'Median home value': 'Delete',
+            #     'Population growth 2010 to 2015 annual': 'Delete',
+            #     'House hold growth 2010 to 2015 annual': 'Delete',
+            #     'Per capita income growth 2010 to 2015 annual': 'Delete',
+            #     '2012 state winner': 'Delete',
+            #     'Medical procedure': 'Special',  # description
+            #     'Total Discharges': 'Delete',
+            #     'Average Covered Charges': 'Numerical',
+            #     'Average Total Payments': 'y'}
             self.clf_type = 'regression'  # opts: 'regression',
             # 'binary-clf', 'multiclass-clf'
 
@@ -767,8 +782,8 @@ class Data:
                 'Underfilled Job Title': 'Delete',
                 'Year First Hired': 'Numerical'
                           }
-            df['Current Annual Salary'] = [float(s[1:]) for s
-                                           in df['Current Annual Salary']]
+            #df['Current Annual Salary'] = [float(s[1:]) for s
+            #                               in df['Current Annual Salary']]
             df['Year First Hired'] = [datetime.datetime.strptime(
                 d, '%m/%d/%Y').year for d
                                       in df['Date First Hired']]
