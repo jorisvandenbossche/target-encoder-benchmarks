@@ -7,7 +7,7 @@ import category_encoders as cat_enc
 from scipy.special import polygamma, logsumexp, kl_div
 from scipy import sparse
 
-from fastText import load_model
+#from fastText import load_model
 
 from sklearn.utils import check_random_state
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -24,11 +24,12 @@ from sklearn.cluster.k_means_ import _k_init
 from sklearn.utils.extmath import row_norms
 
 from dirty_cat import SimilarityEncoder, TargetEncoder
-
+import category_encoders
+import hccencoders
 
 CE_HOME = os.environ.get('CE_HOME')
-from gap_factorization import OnlineGammaPoissonFactorization
-from gap_factorization import OnlineGammaPoissonFactorization2
+#from gap_factorization import OnlineGammaPoissonFactorization
+#from gap_factorization import OnlineGammaPoissonFactorization2
 
 
 class PretrainedFastText(BaseEstimator, TransformerMixin):
@@ -40,6 +41,7 @@ class PretrainedFastText(BaseEstimator, TransformerMixin):
         self.n_components = n_components
 
     def fit(self, X, y=None):
+        from fastText import load_model
         self.ft_model = load_model(
             os.path.join(
                 CE_HOME, 'data', 'fastText', 'crawl-300d-2M-subword.bin'))
@@ -814,6 +816,9 @@ class ColumnEncoder(BaseEstimator, TransformerMixin):
                 smooth_idf=False),
             'TargetEncoder': TargetEncoder(
                 clf_type=self.clf_type, handle_unknown='ignore'),
+            'TargetEncoder-category_encoders': category_encoders.TargetEncoder(),
+            'TargetEncoder-hcc-bayes': hccencoders.HccBayesEncoder(clf_type=self.clf_type),
+            'TargetEncoder-hcc-loo': hccencoders.HccLOOEncoder(clf_type=self.clf_type),
             'MDVEncoder': MDVEncoder(self.clf_type),
             'BackwardDifferenceEncoder': cat_enc.BackwardDifferenceEncoder(),
             'BinaryEncoder': cat_enc.BinaryEncoder(),

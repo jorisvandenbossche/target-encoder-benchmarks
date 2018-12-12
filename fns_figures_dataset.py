@@ -14,18 +14,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
 
-import ngram
-import time
-import Levenshtein as lev
-
-from sklearn import random_projection
-from sklearn import svm
-from sklearn import linear_model
-from sklearn import preprocessing
-from sklearn import metrics
-from sklearn import neural_network
-from sklearn import ensemble
-
 
 CE_HOME = os.environ.get('CE_HOME')
 sys.path.append(os.path.abspath(os.path.join(
