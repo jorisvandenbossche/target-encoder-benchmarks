@@ -1,5 +1,4 @@
 import os
-os.environ['CE_HOME'] = '.'
 
 from fit_predict_categorical_encoding import fit_predict_categorical_encoding
 
@@ -7,9 +6,10 @@ from fit_predict_categorical_encoding import fit_predict_categorical_encoding
 # Parameters ##################################################################
 
 datasets = [
-    #'adult',
-    #'medical_charge',
+    'adult',
+    'medical_charge',
     'employee_salaries',
+    #'house_prices'
 ]
 
 n_jobs = 20
@@ -29,7 +29,7 @@ classifiers = [
 
 encoders = [
     'OneHotEncoderDense',
-    'TargetEncoder',
+    'TargetEncoder-dirty_cat',
     'TargetEncoder-category_encoders',
     'TargetEncoder-hcc-bayes',
     'TargetEncoder-hcc-loo',

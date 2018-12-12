@@ -1,10 +1,8 @@
-import sys
 import os
 import socket
 import time
 import datetime
 import glob
-import json
 import warnings
 
 import numpy as np
@@ -25,28 +23,14 @@ from sklearn.exceptions import ConvergenceWarning
 
 from joblib import Parallel, delayed
 
+# local imports
 from datasets import Data, get_data_folder
 from constants import sample_seed, shuffle_seed, clf_seed
-
-
-CE_HOME = os.environ.get('CE_HOME')
-sys.path.append(os.path.abspath(os.path.join(
-    CE_HOME, 'python', 'categorical_encoding')))
 from column_encoder import ColumnEncoder, DimensionalityReduction
+from utils import read_json, write_json
 
 
 warnings.filterwarnings('ignore', category=ConvergenceWarning)
-
-
-def write_json(data, file):
-    with open(file, 'w') as f:
-        json.dump(data, f, ensure_ascii=False, sort_keys=True, indent=4)
-
-
-def read_json(file):
-    with open(file, 'r') as f:
-        data = json.load(f)
-    return data
 
 
 def array2list(d):
@@ -387,46 +371,28 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                             n_components))
 
                     try:
-                        clf_name = clf.estimator.__class__.__name__
-                        results_dict = {
-                            'dataset': data.name,
-                            'n_splits': n_splits,
-                            'test_size': test_size,
-                            'n_rows': n_rows,
-                            'encoder': encoder,
-                            'str_preprocess': str_preprocess,
-                            'clf': [classifiers[i], clf_name,
-                                    clf.estimator.get_params()],
-                            'ShuffleSplit': [cv.__class__.__name__],
-                            'scaler': [scaler.__class__.__name__,
-                                       scaler.get_params()],
-                            'sample_seed': sample_seed,
-                            'shuffleseed': shuffle_seed,
-                            'col_action': data.col_action,
-                            'clf_type': data.clf_type,
-                            'dimension_reduction': [reduction_method,
-                                                    n_components]
-                            }
+                        clf2 = clf.estimator
                     except AttributeError:
-                        clf_name = clf.__class__.__name__
-                        results_dict = {
-                            'dataset': data.name,
-                            'n_splits': n_splits,
-                            'test_size': test_size,
-                            'n_rows': n_rows,
-                            'encoder': encoder,
-                            'str_preprocess': str_preprocess,
-                            'clf': [classifiers[i], clf_name, clf.get_params()],
-                            'ShuffleSplit': [cv.__class__.__name__],
-                            'scaler': [scaler.__class__.__name__,
-                                       scaler.get_params()],
-                            'sample_seed': sample_seed,
-                            'shuffleseed': shuffle_seed,
-                            'col_action': data.col_action,
-                            'clf_type': data.clf_type,
-                            'dimension_reduction': [reduction_method,
-                                                    n_components]
-                            }
+                        clf2 = clf
+                    clf_name = clf2.__class__.__name__
+                    results_dict = {
+                        'dataset': data.name,
+                        'n_splits': n_splits,
+                        'test_size': test_size,
+                        'n_rows': n_rows,
+                        'encoder': encoder,
+                        'str_preprocess': str_preprocess,
+                        'clf': [classifiers[i], clf_name, clf2.get_params()],
+                        'ShuffleSplit': [cv.__class__.__name__],
+                        'scaler': [scaler.__class__.__name__,
+                                   scaler.get_params()],
+                        'sample_seed': sample_seed,
+                        'shuffleseed': shuffle_seed,
+                        'col_action': data.col_action,
+                        'clf_type': data.clf_type,
+                        'dimension_reduction': [reduction_method,
+                                                n_components]
+                        }
 
                     if verify_if_exists(results_path, results_dict):
                         print('Prediction already exists.\n')
