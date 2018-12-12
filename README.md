@@ -80,10 +80,11 @@ TODO:
 * Investigate the different implementations and what the differences are.
 
   Based on that, more clearly benchmark the different options (with/without shrinking,
-  with/without cross-validation, different hyperparameters, ..)
+  with/without cross-validation, different hyperparameters, ..), and investigate
+  the different results for those.
 
 
-Overview of initial runs of the benchmark are in [overview_results.ipynb](overview_results.ipynb) (but the results still need to be investigated).
+Overview of initial runs of the benchmark are in [overview_results.ipynb](overview_results.ipynb) ([on nbviewer](http://nbviewer.jupyter.org/github/jorisvandenbossche/target-encoder-benchmarks/blob/master/overview_results.ipynb))(but the results still need to be investigated).
 
 
 Benchmark code based on the provided code by Patricio Cerda et al (2018): https://arxiv.org/pdf/1806.00979.pdf (*"Similarity encoding for learning with dirty categorical variables"*).
