@@ -55,6 +55,9 @@ class HccBayesEncoder(_HccEncoder):
                 train, test, 'target', feature, drop_origin_feature=True,
                 k=self.k, f=self.f, noise=self.noise)
 
+        # TODO
+        test_transformed = test_transformed.fillna(test_transformed.mean())
+
         if self.clf_type == 'binary-clf':
             transformed = test_transformed.iloc[:, [1]]
             transformed.columns = [feature]
@@ -82,6 +85,9 @@ class HccLOOEncoder(_HccEncoder):
             train_transformed, test_transformed = hcc_regr.LOOEncoding(
                 train, test, 'target', feature, drop_origin_feature=True,
                 noise=self.noise)
+
+        # TODO
+        test_transformed = test_transformed.fillna(test_transformed.mean())
 
         if self.clf_type == 'binary-clf':
             test_transformed.columns = [feature]
