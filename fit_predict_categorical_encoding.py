@@ -24,7 +24,7 @@ from sklearn.exceptions import ConvergenceWarning
 from joblib import Parallel, delayed
 
 # local imports
-from datasets import Data, get_data_folder
+from datasets import get_dataset, get_data_folder
 from constants import sample_seed, shuffle_seed, clf_seed
 from column_encoder import ColumnEncoder, DimensionalityReduction
 from utils import read_json, write_json
@@ -331,7 +331,7 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
         n_rows = choose_nrows(dataset_name=dataset)
         for encoder in encoders:
             print('Dataset: %s' % dataset)
-            data = Data(dataset).get_df()
+            data = get_dataset(dataset).get_df()
             data.preprocess(n_rows=n_rows, str_preprocess=str_preprocess)
             special_col = [col for col in data.col_action
                            if data.col_action[col] == 'Special'][0]
