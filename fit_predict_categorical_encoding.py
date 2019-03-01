@@ -19,14 +19,17 @@ from sklearn.model_selection import StratifiedShuffleSplit, ShuffleSplit
 from sklearn.model_selection import GridSearchCV
 from sklearn.compose import ColumnTransformer
 from sklearn.exceptions import ConvergenceWarning
-
+from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 
 from joblib import Parallel, delayed
+
+import dirty_cat
+import category_encoders
+import hccencoders
 
 # local imports
 from datasets import get_dataset, get_data_folder
 from constants import sample_seed, shuffle_seed, clf_seed
-from column_encoder import ColumnEncoder, DimensionalityReduction
 from utils import read_json, write_json
 
 
@@ -62,7 +65,7 @@ def verify_if_exists(results_path, results_dict):
     return False
 
 
-def instanciate_score_metric(clf_type):
+def instantiate_score_metric(clf_type):
     if clf_type == 'regression':
         score_metric = metrics.r2_score
         score_name = 'r2'
@@ -75,10 +78,10 @@ def instanciate_score_metric(clf_type):
     return score_metric, score_name
 
 
-def instanciate_estimators(clf_type, classifiers, clf_seed,
+def instantiate_estimators(clf_type, classifiers, clf_seed,
                            y=None, **kw):
 
-    score_metric, _ = instanciate_score_metric(clf_type)
+    score_metric, _ = instantiate_score_metric(clf_type)
     param_grid_LGBM = {
         'learning_rate': [0.1, .05, .5], 'num_leaves': [7, 15, 31]}
     param_grid_XGB = {
@@ -178,30 +181,14 @@ def instanciate_estimators(clf_type, classifiers, clf_seed,
     return clfs
 
 
-def select_cross_val(clf_type, n_splits, test_size, custom_cv=None,
-                     col_name=None):
-    if custom_cv is None:
-        if clf_type in ['regression', 'multiclass-clf']:
-            cv = ShuffleSplit(n_splits=n_splits,
-                              test_size=test_size,
-                              random_state=shuffle_seed)
-        if clf_type in ['binary-clf']:
-            cv = StratifiedShuffleSplit(n_splits=n_splits,
-                                        test_size=test_size,
-                                        random_state=shuffle_seed)
-        return cv
-    else:
-        assert custom_cv.__class__.__name__ == 'LeaveRareCatsOut'
-        custom_cv.n_splits = n_splits
-        custom_cv.test_size = test_size
-        custom_cv.random_state = shuffle_seed
-        custom_cv.col_name = col_name
-        return custom_cv
-
-
-def select_scaler():
-    scaler = preprocessing.StandardScaler(with_mean=False)
-    return scaler
+def select_cross_val(clf_type, n_splits, test_size):
+    if clf_type in ['regression']:
+        cv = ShuffleSplit(n_splits=n_splits, test_size=test_size,
+                          random_state=shuffle_seed)
+    if clf_type in ['binary-clf', 'multiclass-clf']:
+        cv = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size,
+                                    random_state=shuffle_seed)
+    return cv
 
 
 def choose_nrows(dataset_name):
@@ -229,38 +216,45 @@ def choose_nrows(dataset_name):
     return n_rows
 
 
-def get_column_action(col_action, xcols, encoder, reduction_method,
-                      n_components, clf_type):
-    encoder_type = {
-        'OneHotEncoderDense':
-            ColumnEncoder(encoder_name='OneHotEncoderDense',
-                          clf_type=clf_type),
-        'OneHotEncoderDense-1':
-            ColumnEncoder(encoder_name='OneHotEncoderDense',
-                          clf_type=clf_type),
-        # 'OneHotEncoder-1' has to be implemented
-        'TargetEncoder':
-            ColumnEncoder(encoder_name='TargetEncoder',
-                          clf_type=clf_type, handle_unknown='ignore'),
-        'Special':
-            ColumnEncoder(encoder_name=encoder,
-                          clf_type=clf_type,
-                          reduction_method=reduction_method,
-                          n_components=n_components),
-        'Numerical':
-            ColumnEncoder(encoder_name=None, clf_type=clf_type)}
+def get_column_action(col_action, xcols, encoder, clf_type):
 
-    column_action = {col: encoder_type[col_action[col]]
-                     for col in xcols}
-    # if verbose:
-    #     print('Column action')
-    #     for col in column_action:
-    #         print('\t', col, column_action[col])
+    encoders_dict = {
+        'OneHotEncoder':
+            OneHotEncoder(handle_unknown='ignore'),
+        'OneHotEncoderDense':
+            OneHotEncoder(handle_unknown='ignore', sparse=False),
+        'TargetEncoder':
+            dirty_cat.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore'),
+        'TargetEncoder-dirty_cat':
+            dirty_cat.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore'),
+        'TargetEncoder-category_encoders':
+            category_encoders.TargetEncoder(),
+        'LeaveOneOutEncoder-category_encoders':
+            category_encoders.LeaveOneOutEncoder(),
+        'TargetEncoder-hcc-bayes':
+            hccencoders.HccBayesEncoder(clf_type=clf_type),
+        'TargetEncoder-hcc-loo':
+            hccencoders.HccLOOEncoder(clf_type=clf_type),
+        'Numerical': 'passthrough',
+        None: FunctionTransformer(None, validate=True),
+    }
+
+    column_action = {}
+
+    for col in xcols:
+        enc_name = col_action[col]
+        if enc_name == 'Special':
+            enc = encoders_dict[encoder]
+        else:
+            enc = encoders_dict[enc_name]
+        column_action[col] = enc
+
     return column_action
 
 
 def fit_predict_fold(data, scaler, column_action, clf, encoder,
-                     reduction_method, n_components,
                      fold, n_splits, train_index, test_index):
     """
     fits and predicts a X with y given multiple parameters.
@@ -271,7 +265,7 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
     y_train = y[train_index]
 
     # Use ColumnTransformer to combine the features
-    transformer = ColumnTransformer([(col, column_action[col], col)
+    transformer = ColumnTransformer([(col, column_action[col], [col])
                                      for col in data.xcols])
 
     X_train = transformer.fit_transform(data_train[data.xcols], y_train)
@@ -290,7 +284,7 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
     X_test = transformer.transform(data_test)
     X_test = scaler.transform(X_test)
 
-    score_metric, score_name = instanciate_score_metric(data.clf_type)
+    score_metric, score_name = instantiate_score_metric(data.clf_type)
 
     if data.clf_type in ['regression', 'multiclass-clf']:
         y_pred = clf.predict(X_test)
@@ -315,10 +309,8 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
 
 
 def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
-                                     classifiers, reduction_methods,
-                                     n_components,
-                                     test_size, n_splits, n_jobs, results_path,
-                                     model_path=None, custom_cv=None):
+                                     classifiers, test_size, n_splits, n_jobs,
+                                     results_path, model_path=None):
     '''
     Learning with dirty categorical variables.
     '''
@@ -333,43 +325,27 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
             print('Dataset: %s' % dataset)
             data = get_dataset(dataset).get_df()
             data.preprocess(n_rows=n_rows, str_preprocess=str_preprocess)
-            special_col = [col for col in data.col_action
-                           if data.col_action[col] == 'Special'][0]
-            if type(encoder) is list:
-                # special_col = [col for col in data.col_action
-                #                if data.col_action[col] == 'Special'][0]
-                for i, enc in enumerate(encoder):
-                    print(enc)
-                    if i == 0:
-                        data.col_action[special_col] = 'Special'
-                    else:
-                        new_col = '%s_%d' % (special_col, i)
-                        data.df[new_col] = data.df[special_col].copy()
-                        data.col_action[new_col] = enc
-                        data.xcols.append(new_col)
-            for reduction_method in reduction_methods:
-                print('Data shape: %d, %d' % data.df.shape)
-                cv = select_cross_val(data.clf_type, n_splits, test_size,
-                                      custom_cv=custom_cv,
-                                      col_name=special_col)
-                scaler = select_scaler()
+            print('Data shape: %d, %d' % data.df.shape)
 
-                # Define classifiers
-                clfs = instanciate_estimators(
-                    data.clf_type, classifiers, clf_seed,
-                    y=data.df.loc[:, data.ycol].values,
-                    model_path=model_path)
+            cv = select_cross_val(data.clf_type, n_splits, test_size)
+            scaler = preprocessing.StandardScaler(with_mean=False)
 
-                for i, clf in enumerate(clfs):
-                    print(
-                        '{}: {} \n{}: {} \n{}: {} \n{}: {} \n{}: {},{}'.format(
-                            'Prediction column', data.ycol,
-                            'Task type', str(data.clf_type),
-                            'Classifier', clf,
-                            'Encoder', encoder,
-                            'Dimension reduction', reduction_method,
-                            n_components))
+            # Define classifiers
+            clfs = instantiate_estimators(
+                data.clf_type, classifiers, clf_seed,
+                y=data.df.loc[:, data.ycol].values,
+                model_path=model_path)
 
+            for i, clf in enumerate(clfs):
+                # import pdb; pdb.set_trace()
+                # print(
+                #     '{}: {} \n{}: {} \n{}: {} \n{}: {} \n{}: {}'.format(
+                #         'Prediction column', data.ycol,
+                #         'Task type', str(data.clf_type),
+                #         'Classifier', clf,
+                #         'Encoder', encoder))
+
+                try:
                     try:
                         clf2 = clf.estimator
                     except AttributeError:
@@ -390,8 +366,6 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                         'shuffleseed': shuffle_seed,
                         'col_action': data.col_action,
                         'clf_type': data.clf_type,
-                        'dimension_reduction': [reduction_method,
-                                                n_components]
                         }
 
                     if verify_if_exists(results_path, results_dict):
@@ -399,18 +373,14 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                         continue
 
                     start = time.time()
-                    if type(encoder) is str:
-                        column_action = get_column_action(
-                            data.col_action, data.xcols, encoder,
-                            reduction_method, n_components, data.clf_type)
-                    if type(encoder) is list:
-                        column_action = get_column_action(
-                            data.col_action, data.xcols, encoder[0],
-                            reduction_method, n_components, data.clf_type)
+
+                    column_action = get_column_action(
+                        data.col_action, data.xcols, encoder,
+                        data.clf_type)
+
                     pred = Parallel(n_jobs=n_jobs)(
                         delayed(fit_predict_fold)(
                             data, scaler, column_action, clf, encoder,
-                            reduction_method, n_components,
                             fold, cv.n_splits, train_index, test_index)
                         for fold, (train_index, test_index)
                         in enumerate(
@@ -429,10 +399,12 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                     now = ''.join([c for c in str(datetime.datetime.now())
                                    if c.isdigit()])
                     filename = ('%s_%s_%s_%s_%s.json' %
-                                (pc_name, data.name, classifiers[i],
-                                 encoder, now))
+                                   (pc_name, data.name, classifiers[i],
+                                    encoder, now))
                     results_file = os.path.join(results_path, filename)
                     results_dict = array2list(results_dict)
                     write_json(results_dict, results_file)
                     print('prediction time: %.1f s.' % (time.time() - start))
                     print('Saving results to: %s\n' % results_file)
+                except:  # noqa
+                    print('Prediction failed.\n'))

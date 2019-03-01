@@ -9,10 +9,12 @@ datasets = [
     'adult',
     'medical_charge',
     'employee_salaries',
-    #'house_prices'
+    # 'house_prices'
 ]
 
+# Number of jobs for the folds (each model itself is run with n_jobs=1)
 n_jobs = 20
+# Number of times a shuffled train/test split is done
 n_splits = 20
 test_size = 1./3
 str_preprocess = True
@@ -31,17 +33,15 @@ encoders = [
     'OneHotEncoderDense',
     'TargetEncoder-dirty_cat',
     'TargetEncoder-category_encoders',
+    'LeaveOneOutEncoder-category_encoders',
     'TargetEncoder-hcc-bayes',
     'TargetEncoder-hcc-loo',
     ]
 
-reduction_methods = [None]
 
 fit_predict_categorical_encoding(datasets=datasets,
                                  str_preprocess=str_preprocess,
                                  encoders=encoders, classifiers=classifiers,
-                                 reduction_methods=reduction_methods,
-                                 n_components=n_components,
                                  test_size=test_size, n_splits=n_splits,
                                  n_jobs=n_jobs, results_path=results_path,
                                  model_path='')
