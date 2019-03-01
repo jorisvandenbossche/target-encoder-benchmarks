@@ -9,6 +9,7 @@ datasets = [
     'adult',
     'medical_charge',
     'employee_salaries',
+    'random-n=100-zipf=2',
     # 'house_prices'
 ]
 

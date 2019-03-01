@@ -407,4 +407,4 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                     print('prediction time: %.1f s.' % (time.time() - start))
                     print('Saving results to: %s\n' % results_file)
                 except:  # noqa
-                    print('Prediction failed.\n'))
+                    print('Prediction failed.\n')
