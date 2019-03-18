@@ -31,6 +31,7 @@ classifiers = [
 
 
 encoders = [
+    'Delete',
     'OneHotEncoderDense',
     'TargetEncoder-dirty_cat',
     'TargetEncoder-category_encoders',

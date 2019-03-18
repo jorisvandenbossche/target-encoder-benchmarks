@@ -238,6 +238,7 @@ def get_column_action(col_action, xcols, encoder, clf_type):
         'TargetEncoder-hcc-loo':
             hccencoders.HccLOOEncoder(clf_type=clf_type),
         'Numerical': 'passthrough',
+        'Delete': 'drop',
         None: FunctionTransformer(None, validate=True),
     }
 
