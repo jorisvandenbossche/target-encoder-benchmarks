@@ -43,13 +43,6 @@ def get_results_df(datadir):
         df['n_splits'] = f_dict['n_splits']
         df['results_file'] = os.path.split(f)[1]
 
-        dim_red_method = (('%s (d=%s) %s') % (
-            f_dict['encoder'],
-            f_dict['dimension_reduction'][1],
-            f_dict['dimension_reduction'][0]))
-        # min_d = min(f_dict['dimension_reduction'][1], min_d)
-        df['Dimension reduction method'] = dim_red_method
-
         # clf type
         df['score_type'] = SCORE_TYPES[f_dict['clf_type']]
         df_all.append(df)
