@@ -260,15 +260,17 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
     """
     fits and predicts a X with y given multiple parameters.
     """
-    start_encoding = time.time()
-    y = data.df[data.ycol].values
-    data_train = data.df.iloc[train_index, :]
-    y_train = y[train_index]
-
     # Use ColumnTransformer to combine the features
     transformer = ColumnTransformer([(col, column_action[col], [col])
                                      for col in data.xcols])
 
+    # training
+
+    y = data.df[data.ycol].values
+    data_train = data.df.iloc[train_index, :]
+    y_train = y[train_index]
+
+    start_encoding = time.time()
     X_train = transformer.fit_transform(data_train[data.xcols], y_train)
     X_train = scaler.fit_transform(X_train, y_train)
     encoding_time = time.time() - start_encoding
@@ -277,15 +279,27 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
     clf.fit(X_train, y_train)
     training_time = time.time() - start_training
 
+    score_metric, score_name = instantiate_score_metric(data.clf_type)
+
+    if data.clf_type in ['regression', 'multiclass-clf']:
+        y_pred_train = clf.predict(X_train)
+    elif data.clf_type == 'binary-clf':
+        try:
+            y_pred_train = clf.predict_proba(X_train)[:, 1]
+        except AttributeError:
+            y_pred_train = clf.decision_function(X_train)
+
+    score_train = score_metric(y_train, y_pred_train)
+
     train_shape = X_train.shape
     del X_train
+
+    # testing
 
     data_test = data.df.iloc[test_index, :]
     y_test = y[test_index]
     X_test = transformer.transform(data_test)
     X_test = scaler.transform(X_test)
-
-    score_metric, score_name = instantiate_score_metric(data.clf_type)
 
     if data.clf_type in ['regression', 'multiclass-clf']:
         y_pred = clf.predict(X_test)
@@ -302,10 +316,11 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
           'n_samp: %d, ' % train_shape[0],
           'n_feat: %d, ' % train_shape[1],
           '%s: %.4f, ' % (score_name, score),
+          '%s-train: %.4f, ' % (score_name, score_train),
           'enc-time: %.0f s.' % encoding_time,
           'train-time: %.0f s.' % training_time)
     results = [fold, y_train.shape[0], X_test.shape[1],
-               score, encoding_time, training_time]
+               score, score_train, encoding_time, training_time]
     return results
 
 
@@ -391,8 +406,9 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                                'n_train_samples': list(pred[:, 1]),
                                'n_train_features': list(pred[:, 2]),
                                'score': list(pred[:, 3]),
-                               'encoding_time': list(pred[:, 4]),
-                               'training_time': list(pred[:, 5])}
+                               'train_score': list(pred[:, 4]),
+                               'encoding_time': list(pred[:, 5]),
+                               'training_time': list(pred[:, 6])}
                     results_dict['results'] = results
 
                     # Saving results
