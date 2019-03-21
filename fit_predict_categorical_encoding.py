@@ -223,6 +223,8 @@ def get_column_action(col_action, xcols, encoder, clf_type):
             OneHotEncoder(handle_unknown='ignore'),
         'OneHotEncoderDense':
             OneHotEncoder(handle_unknown='ignore', sparse=False),
+        'OneHotEncoderDense-1':
+            OneHotEncoder(handle_unknown='ignore', sparse=False),
         'TargetEncoder':
             dirty_cat.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore'),
