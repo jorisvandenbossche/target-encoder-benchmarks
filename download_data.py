@@ -44,6 +44,13 @@ else:
     import employee_salaries
     employee_salaries.get_employee_salaries_df()
 
+output_file = os.path.join('.', 'data', 'traffic_violations', 'raw', 'rows.csv')
+if os.path.exists(output_file):
+    print("{} already exists".format(output_file))
+else:
+    import traffic_violations
+    traffic_violations.get_traffic_violations_df()
+
 
 ## Adult
 

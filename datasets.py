@@ -15,6 +15,7 @@ def get_dataset(name):
         'employee_salaries': EmployeeSalariesDataset,
         'medical_charge': MedicalChargeDataset,
         'adult': AdultDataset,
+        'traffic_violations': TrafficViolationsDataset,
         'random-n=100-zipf=2': RandomDataset,
     }
     return DATASET_CLASSES[name]()
@@ -245,6 +246,96 @@ class EmployeeSalariesDataset(Dataset):
         df['Year First Hired'] = [datetime.datetime.strptime(
             d, '%m/%d/%Y').year for d
                                     in df['Date First Hired']]
+        self.df = df
+
+
+def float_to_int(col, index):
+    c = []
+    for elt in col:
+        try:
+            c.append(int(elt))
+        except ValueError as e:
+            c.append(np.nan)
+    return pd.Series(c, dtype=np.object, index=index)
+
+
+class TrafficViolationsDataset(Dataset):
+
+    name = 'traffic_violations'
+
+    clf_type = "multiclass"
+
+    col_action = {
+        "Accident": "Delete",
+        "Agency": "Delete",
+        "Alcohol": "OneHotEncoderDense-1",
+        "Arrest Type": "OneHotEncoderDense",
+        "Article": "Delete",
+        "Belts": "OneHotEncoderDense-1",
+        "Charge": "Delete",
+        "Color": "Delete",
+        "Commercial License": "OneHotEncoderDense-1",
+        "Commercial Vehicle": "OneHotEncoderDense-1",
+        "Contributed To Accident": "Delete",
+        "DL State": "Delete",
+        "Date Of Stop": "Delete",
+        "Description": "Special",
+        "Driver City": "Delete",
+        "Driver State": "Delete",
+        "Fatal": "OneHotEncoderDense-1",
+        "Gender": "OneHotEncoderDense",
+        "Geolocation": "Delete",
+        "HAZMAT": "OneHotEncoderDense",
+        "Latitude": "Delete",
+        "Location": "Delete",
+        "Longitude": "Delete",
+        "Make": "Delete",
+        "Model": "Delete",
+        "Personal Injury": "Delete",
+        "Property Damage": "OneHotEncoderDense-1",
+        "Race": "OneHotEncoderDense",
+        "State": "Delete",
+        "SubAgency": "Delete",
+        "Time Of Stop": "Delete",
+        "VehicleType": "Delete",
+        "Violation Type": "y",
+        "Work Zone": "OneHotEncoderDense-1",
+        "Year": "Numerical"
+    }
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'traffic_violations')
+        create_folder(data_path, 'output/results')
+        data_file = os.path.join(data_path, 'raw', 'rows.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file)
+        df['Year'] = float_to_int(df['Year'], df.index)
+        clean = ['Make', 'Model']
+        for c in clean:
+            arr = []
+            for elt in df[c]:
+                if elt == 'NONE':
+                    arr.append(np.nan)
+                else:
+                    arr.append(elt)
+            df[c] = pd.Series(arr, dtype=np.object, index=df.index)
+
+        for c in df:
+            arr = []
+            for elt in df[c]:
+                if isinstance(elt, str) and '\n' in elt:
+                    elt = elt.replace('\n', '')
+                arr.append(elt)
+            df[c] = pd.Series(arr, dtype=df[c].dtype, index=df.index)
+
+        # df['VehicleType'] = df['VehicleType'].astype('category')
+        # df['Arrest Type'] = df['Arrest Type'].astype('category')
+        # df['Race'] = df['Race'].astype('category')
+        # df['Violation Type'] = df['Violation Type'].astype('category')
+
         self.df = df
 
 
