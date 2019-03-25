@@ -263,7 +263,7 @@ class TrafficViolationsDataset(Dataset):
 
     name = 'traffic_violations'
 
-    clf_type = "multiclass"
+    clf_type = "multiclass-clf"
 
     col_action = {
         "Accident": "Delete",
