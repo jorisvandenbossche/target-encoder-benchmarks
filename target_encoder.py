@@ -6,8 +6,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_array
 
 
-def lambda_(x, n):
-    out = x / (x + n)
+def lambda_(n, n_avg):
+    out = n / (n + n_avg)
+    return out
+
+
+def lambda_exponential(n, k, f):
+    out = 1 / (1 + np.exp(-(n - k) / f))
+    if n == 1:
+        out = 0.
     return out
 
 
@@ -20,7 +27,7 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
     probability of y conditional on this category.
     In addition it takes an empirical Bayes approach to shrink the estimate.
 
- 
+
     Parameters
     ----------
     categories : 'auto' or a list of lists/arrays of values.
@@ -63,11 +70,15 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                  categories='auto',
                  clf_type='binary-clf',
                  dtype=np.float64, handle_unknown='error',
-                 ):
+                 shrinkage='bayes',
+                 k=1, f=1.0):
         self.categories = categories
         self.dtype = dtype
         self.clf_type = clf_type
         self.handle_unknown = handle_unknown
+        self.shrinkage = shrinkage
+        self.k_ = k
+        self.f = f
 
     def fit(self, X, y):
         """Fit the TargetEncoder to X.
@@ -192,8 +203,12 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                         Eyx = 0
                     else:
                         Eyx = self.Eyx_[j][x]
-                    lambda_n = lambda_(self.counter_[j][x], self.n/self.k[j])
-                    encoder[x] = lambda_n*Eyx + (1 - lambda_n)*self.Ey_
+                    n = self.counter_[j][x]
+                    if self.shrinkage == 'bayes':
+                        lambda_n = lambda_(n, self.n/self.k[j])
+                    elif self.shrinkage == 'exponential':
+                        lambda_n = lambda_exponential(n, self.k_, self.f)
+                    encoder[x] = lambda_n * Eyx + (1 - lambda_n) * self.Ey_
                 x_out = np.zeros((len(X[:, j]), 1))
                 for i, x in enumerate(X[:, j]):
                     x_out[i, 0] = encoder[x]
