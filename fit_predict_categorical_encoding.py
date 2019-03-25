@@ -235,7 +235,7 @@ def get_column_action(col_action, xcols, encoder, clf_type):
         'TargetEncoder-shrinkage=exp_1_1':
             target_encoder.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore',
-                shrinkage='exponential', k=1, f=1.0),
+                shrinkage='exponential', n_min_half=1, f=1.0),
         'TargetEncoder-dirty_cat':
             dirty_cat.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore'),
@@ -433,5 +433,5 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                     write_json(results_dict, results_file)
                     print('prediction time: %.1f s.' % (time.time() - start))
                     print('Saving results to: %s\n' % results_file)
-                except:  # noqa
-                    print('Prediction failed.\n')
+                except Exception as e:  # noqa
+                    print('Prediction failed: ', str(e))

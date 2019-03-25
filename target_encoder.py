@@ -71,13 +71,13 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                  clf_type='binary-clf',
                  dtype=np.float64, handle_unknown='error',
                  shrinkage='bayes',
-                 k=1, f=1.0):
+                 n_min_half=1, f=1.0):
         self.categories = categories
         self.dtype = dtype
         self.clf_type = clf_type
         self.handle_unknown = handle_unknown
         self.shrinkage = shrinkage
-        self.k_ = k
+        self.n_min_half = n_min_half
         self.f = f
 
     def fit(self, X, y):
@@ -207,7 +207,8 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                     if self.shrinkage == 'bayes':
                         lambda_n = lambda_(n, self.n/self.k[j])
                     elif self.shrinkage == 'exponential':
-                        lambda_n = lambda_exponential(n, self.k_, self.f)
+                        lambda_n = lambda_exponential(n, self.n_min_half,
+                                                      self.f)
                     encoder[x] = lambda_n * Eyx + (1 - lambda_n) * self.Ey_
                 x_out = np.zeros((len(X[:, j]), 1))
                 for i, x in enumerate(X[:, j]):
