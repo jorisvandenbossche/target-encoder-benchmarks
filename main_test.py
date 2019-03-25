@@ -33,6 +33,8 @@ classifiers = [
 encoders = [
     'Delete',
     'OneHotEncoderDense',
+    'TargetEncoder-shrinkage=bayes',
+    'TargetEncoder-shrinkage=exp_1_1',
     'TargetEncoder-dirty_cat',
     'TargetEncoder-category_encoders',
     'LeaveOneOutEncoder-category_encoders',

@@ -26,6 +26,7 @@ from joblib import Parallel, delayed
 import dirty_cat
 import category_encoders
 import hccencoders
+import target_encoder
 
 # local imports
 from datasets import get_dataset, get_data_folder
@@ -228,6 +229,13 @@ def get_column_action(col_action, xcols, encoder, clf_type):
         'TargetEncoder':
             dirty_cat.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore'),
+        'TargetEncoder-shrinkage=bayes':
+            target_encoder.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore', shrinkage='bayes'),
+        'TargetEncoder-shrinkage=exp_1_1':
+            target_encoder.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore',
+                shrinkage='exponential', k=1, f=1.0),
         'TargetEncoder-dirty_cat':
             dirty_cat.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore'),
