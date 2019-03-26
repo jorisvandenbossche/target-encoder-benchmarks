@@ -13,7 +13,8 @@ def lambda_(n, n_avg):
 
 def lambda_exponential(n, k, f):
     out = 1 / (1 + np.exp(-(n - k) / f))
-    if n == 1:
+    if n <= 1:
+        # if n is 0 or 1
         out = 0.
     return out
 
@@ -171,8 +172,8 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
             X = X_temp
 
         n_samples, n_features = X.shape
-        X_int = np.zeros_like(X, dtype=np.int)
-        X_mask = np.ones_like(X, dtype=np.bool)
+        # X_int = np.zeros_like(X, dtype=np.int)
+        # X_mask = np.ones_like(X, dtype=np.bool)
 
         for i in range(n_features):
             Xi = X[:, i]
@@ -184,14 +185,14 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                     msg = ("Found unknown categories {0} in column {1}"
                            " during transform".format(diff, i))
                     raise ValueError(msg)
-                else:
-                    # Set the problematic rows to an acceptable value and
-                    # continue `The rows are marked `X_mask` and will be
-                    # removed later.
-                    X_mask[:, i] = valid_mask
-                    Xi = Xi.copy()
-                    Xi[~valid_mask] = self.categories_[i][0]
-            X_int[:, i] = self._label_encoders_[i].transform(Xi)
+            #     else:
+            #         # Set the problematic rows to an acceptable value and
+            #         # continue `The rows are marked `X_mask` and will be
+            #         # removed later.
+            #         X_mask[:, i] = valid_mask
+            #         Xi = Xi.copy()
+            #         Xi[~valid_mask] = self.categories_[i][0]
+            # X_int[:, i] = self._label_encoders_[i].transform(Xi)
 
         out = []
         for j, cats in enumerate(self.categories_):
