@@ -29,7 +29,7 @@ import hccencoders
 import target_encoder
 
 # local imports
-from datasets import get_dataset, get_data_folder
+from datasets import get_dataset, BENCHMARK_HOME
 from constants import sample_seed, shuffle_seed, clf_seed
 from utils import read_json, write_json
 
@@ -79,8 +79,7 @@ def instantiate_score_metric(clf_type):
     return score_metric, score_name
 
 
-def instantiate_estimators(clf_type, classifiers, clf_seed,
-                           y=None, **kw):
+def instantiate_estimators(clf_type, classifiers, clf_seed, y=None):
 
     score_metric, _ = instantiate_score_metric(clf_type)
     param_grid_LGBM = {
@@ -345,13 +344,11 @@ def fit_predict_fold(data, scaler, column_action, clf, encoder,
 
 def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
                                      classifiers, test_size, n_splits, n_jobs,
-                                     results_path, model_path=None):
+                                     results_path):
     '''
     Learning with dirty categorical variables.
     '''
-    path = get_data_folder()
-    results_path = os.path.join(path, results_path)
-    model_path = os.path.join(path, model_path)
+    results_path = os.path.join(BENCHMARK_HOME, results_path)
     if not os.path.exists(results_path):
         os.makedirs(results_path)
     for dataset in datasets:
@@ -362,14 +359,19 @@ def fit_predict_categorical_encoding(datasets, str_preprocess, encoders,
             data.preprocess(n_rows=n_rows, str_preprocess=str_preprocess)
             print('Data shape: %d, %d' % data.df.shape)
 
+            n_cats = len(np.unique(data.df[data.special_column]))
+            if (n_cats > 5000) and 'OneHotEncoder' in encoder:
+                print('Skipping this encoder, too many categories '
+                      '({0})'.format(n_cats))
+                continue
+
             cv = select_cross_val(data.clf_type, n_splits, test_size)
             scaler = preprocessing.StandardScaler(with_mean=False)
 
             # Define classifiers
             clfs = instantiate_estimators(
                 data.clf_type, classifiers, clf_seed,
-                y=data.df.loc[:, data.ycol].values,
-                model_path=model_path)
+                y=data.df.loc[:, data.ycol].values)
 
             for i, clf in enumerate(clfs):
                 # import pdb; pdb.set_trace()

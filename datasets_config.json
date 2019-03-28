@@ -1,0 +1,867 @@
+{
+    "adult": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "age": "Numerical",
+            "capital-gain": "Numerical",
+            "capital-loss": "Numerical",
+            "education": "OneHotEncoderDense",
+            "education-num": "Numerical",
+            "fnlwgt": "Delete",
+            "hours-per-week": "Numerical",
+            "income": "y",
+            "marital-status": "OneHotEncoderDense",
+            "native-country": "OneHotEncoderDense",
+            "occupation": "Special",
+            "race": "OneHotEncoderDense",
+            "relationship": "OneHotEncoderDense",
+            "sex": "OneHotEncoderDense",
+            "workclass": "OneHotEncoderDense"
+        },
+        "dirtiness_type": {
+            "occupation": "Clean"
+        }
+    },
+    "beer_reviews": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "beer_abv": "Delete",
+            "beer_beerid": "Delete",
+            "beer_name": "Special",
+            "beer_style": "y",
+            "brewery_id": "Delete",
+            "brewery_name": "Delete",
+            "review_appearance": "Numerical",
+            "review_aroma": "Numerical",
+            "review_overall": "Delete",
+            "review_palate": "Numerical",
+            "review_profilename": "Delete",
+            "review_taste": "Numerical",
+            "review_time": "Delete"
+        },
+        "dirtiness_type": {
+            "beer_name": "?"
+        }
+    },
+    "building_permits": {
+        "clf_type": "regression",
+        "col_action": {
+            "ESTIMATED_COST": "y",
+            "PERMIT_TYPE": "OneHotEncoderDense",
+            "WORK_DESCRIPTION": "Special"
+        },
+        "dirtiness_type": {
+            "WORK_DESCRIPTION": "Description"
+        }
+    },
+    "cacao_flavors": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "Bean\nType": "y",
+            "Broad Bean\nOrigin": "Special",
+            "Cocoa\nPercent": "Numerical",
+            "Company\nLocation": "Delete",
+            "Company \n(Maker-if known)": "Delete",
+            "REF": "Delete",
+            "Rating": "Numerical",
+            "Review\nDate": "Delete",
+            "Specific Bean Origin\nor Bar Name": "Delete"
+        },
+        "dirtiness_type": {
+            "Broad Bean\nOrigin": "?"
+        }
+    },
+    "california_housing": {
+        "clf_type": "regression",
+        "col_action": {
+            "households": "Numerical",
+            "housing_median_age": "Delete",
+            "latitude": "Delete",
+            "longitude": "Delete",
+            "median_house_value": "y",
+            "median_income": "Numerical",
+            "ocean_proximity": "Special",
+            "population": "Numerical",
+            "total_bedrooms": "Numerical",
+            "total_rooms": "Numerical"
+        },
+        "dirtiness_type": {
+            "ocean_proximity": "Abbreviation"
+        }
+    },
+    "colleges": {
+        "clf_type": "regression",
+        "col_action": {
+            "City": "Delete",
+            "Gender": "OneHotEncoderDense",
+            "Highest Degree": "OneHotEncoderDense",
+            "Ownership": "OneHotEncoderDense",
+            "Percent Asian": "Numerical",
+            "Percent Black": "Numerical",
+            "Percent Hispanic": "Numerical",
+            "Percent Part Time": "Numerical",
+            "Percent Pell Grant": "y",
+            "Percent White": "Numerical",
+            "Predominant Degree": "OneHotEncoderDense",
+            "Region": "OneHotEncoderDense",
+            "School Name": "Special",
+            "Spend per student": "Numerical",
+            "State": "OneHotEncoderDense",
+            "Undergrad Size": "Numerical",
+            "ZIP": "Delete"
+        },
+        "dirtiness_type": {
+            "School Name": "Overlap"
+        }
+    },
+    "consumer_complaints": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "Company": "Delete",
+            "Company public response": "OneHotEncoderDense",
+            "Company response to consumer": "OneHotEncoderDense",
+            "Complaint ID": "Delete",
+            "Consumer complaint narrative": "Delete",
+            "Consumer consent provided?": "Delete",
+            "Consumer disputed?": "y",
+            "Date received": "Delete",
+            "Date sent to company": "Delete",
+            "Issue": "Special",
+            "Product": "OneHotEncoderDense",
+            "State": "Delete",
+            "Sub-issue": "Delete",
+            "Sub-product": "OneHotEncoderDense",
+            "Submitted via": "OneHotEncoderDense",
+            "Tags": "Delete",
+            "Timely response?": "OneHotEncoderDense-1",
+            "ZIP code": "Delete"
+        },
+        "dirtiness_type": {
+            "Issue": "?"
+        }
+    },
+    "crime_data": {
+        "clf_type": "regression",
+        "col_action": {
+            "Address": "Delete",
+            "Area ID": "Delete",
+            "Area Name": "OneHotEncoderDense",
+            "Crime Code": "Delete",
+            "Crime Code 1": "Delete",
+            "Crime Code 2": "Delete",
+            "Crime Code 3": "Delete",
+            "Crime Code 4": "Delete",
+            "Crime Code Description": "Special",
+            "Cross Street": "Delete",
+            "DR Number": "Delete",
+            "Date Occurred": "Delete",
+            "Date Reported": "Delete",
+            "Location ": "Delete",
+            "MO Codes": "Delete",
+            "Premise Code": "Delete",
+            "Premise Description": "OneHotEncoderDense",
+            "Reporting District": "Delete",
+            "Status Code": "Delete",
+            "Status Description": "Delete",
+            "Time Occurred": "Delete",
+            "Victim Age": "y",
+            "Victim Descent": "Delete",
+            "Victim Sex": "OneHotEncoderDense",
+            "Weapon Description": "OneHotEncoderDense",
+            "Weapon Used Code": "Delete"
+        },
+        "dirtiness_type": {
+            "Crime Code Description": "Description"
+        }
+    },
+    "dating_profiles": {
+        "clf_type": "regression",
+        "col_action": {
+            "age": "y",
+            "body_type": "Delete",
+            "diet": "Special",
+            "drinks": "OneHotEncoderDense",
+            "drugs": "OneHotEncoderDense",
+            "education": "OneHotEncoderDense",
+            "essay0": "Delete",
+            "essay1": "Delete",
+            "essay2": "Delete",
+            "essay3": "Delete",
+            "essay4": "Delete",
+            "essay5": "Delete",
+            "essay6": "Delete",
+            "essay7": "Delete",
+            "essay8": "Delete",
+            "essay9": "Delete",
+            "ethnicity": "Delete",
+            "height": "Numerical",
+            "income": "Delete",
+            "job": "Special",
+            "last_online": "Delete",
+            "location": "Delete",
+            "offspring": "OneHotEncoderDense",
+            "orientation": "OneHotEncoderDense",
+            "pets": "OneHotEncoderDense",
+            "religion": "Delete",
+            "sex": "OneHotEncoderDense",
+            "sign": "OneHotEncoderDense",
+            "smokes": "OneHotEncoderDense",
+            "speaks": "Delete",
+            "status": "OneHotEncoderDense"
+        },
+        "dirtiness_type": {
+            "": "?"
+        }
+    },
+    "open_payments": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "Applicable_Manufacturer_or_Applicable_GPO_Making_Payment_Name": "Special",
+            "Dispute_Status_for_Publication": "OneHotEncoderDense-1",
+            "Name_of_Associated_Covered_Device_or_Medical_Supply1": "Delete",
+            "Name_of_Associated_Covered_Drug_or_Biological1": "Delete",
+            "Physician_Specialty": "Delete",
+            "Total_Amount_of_Payment_USDollars": "Numerical",
+            "status": "y"
+        },
+        "dirtiness_type": {
+            "Applicable_Manufacturer_or_Applicable_GPO_Making_Payment_Name": "Synonyms; Overlap"
+        }
+    },
+    "drug_directory": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "ACTIVE_INGRED_UNIT": "Delete",
+            "ACTIVE_NUMERATOR_STRENGTH": "Delete",
+            "APPLICATIONNUMBER": "Delete",
+            "DEASCHEDULE": "Delete",
+            "DOSAGEFORMNAME": "OneHotEncoderDense",
+            "ENDMARKETINGDATE": "Delete",
+            "LABELERNAME": "Delete",
+            "LISTING_RECORD_CERTIFIED_THROUGH": "Delete",
+            "MARKETINGCATEGORYNAME": "Delete",
+            "NDC_EXCLUDE_FLAG": "Delete",
+            "NONPROPRIETARYNAME": "Special",
+            "PHARM_CLASSES": "Delete",
+            "PRODUCTID": "Delete",
+            "PRODUCTNDC": "Delete",
+            "PRODUCTTYPENAME": "y",
+            "PROPRIETARYNAME": "Delete",
+            "PROPRIETARYNAMESUFFIX": "Delete",
+            "ROUTENAME": "OneHotEncoderDense",
+            "STARTMARKETINGDATE": "Delete",
+            "SUBSTANCENAME": "Delete"
+        },
+        "dirtiness_type": {
+            "NONPROPRIETARYNAME": "Overlap"
+        }
+    },
+    "employee_salaries": {
+        "clf_type": "regression",
+        "col_action": {
+            "2016 Gross Pay Received": "Delete",
+            "2016 Overtime Pay": "Delete",
+            "Assignment Category": "OneHotEncoderDense-1",
+            "Current Annual Salary": "y",
+            "Department": "Delete",
+            "Department Name": "OneHotEncoderDense",
+            "Division": "OneHotEncoderDense",
+            "Employee Position Title": "Special",
+            "Full Name": "Delete",
+            "Gender": "OneHotEncoderDense",
+            "Underfilled Job Title": "Delete",
+            "Year First Hired": "Numerical"
+        },
+        "dirtiness_type": {
+            "Employee Position Title": "Overlap"
+        }
+    },
+    "federal_election": {
+        "clf_type": "regression",
+        "col_action": {
+            "AMNDT_IND": "Delete",
+            "CITY": "Delete",
+            "CMTE_ID": "Delete",
+            "EMPLOYER": "Delete",
+            "ENTITY_TP": "OneHotEncoderDense",
+            "FILE_NUM": "Delete",
+            "IMAGE_NUM": "Delete",
+            "MEMO_CD": "Delete",
+            "MEMO_TEXT": "Delete",
+            "NAME": "Delete",
+            "OCCUPATION": "Special",
+            "OTHER_ID": "Delete",
+            "RPT_TP": "Delete",
+            "STATE": "OneHotEncoderDense",
+            "SUB_ID": "Delete",
+            "TRANSACTION_AMT": "y",
+            "TRANSACTION_DT": "Delete",
+            "TRANSACTION_PGI": "OneHotEncoderDense",
+            "TRANSACTION_TP": "OneHotEncoderDense",
+            "TRAN_ID": "Delete",
+            "ZIP_CODE": "Delete"
+        },
+        "dirtiness_type": {
+            "OCCUPATION": "Overlap; Open-ended"
+        }
+    },
+    "firefighter_interventions": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "nb_ope": "Numerical",
+            "ope_annee": "Numerical",
+            "ope_categorie": "y",
+            "ope_code_insee": "Delete",
+            "ope_code_postal": "Special",
+            "ope_nom_commune": "Delete",
+            "ope_semaine": "Numerical"
+        },
+        "dirtiness_type": {
+            "ope_code_postal": "zip code"
+        }
+    },
+    "house_prices": {
+        "clf_type": "regression",
+        "col_action": {
+            "1stFlrSF": "Numerical",
+            "2ndFlrSF": "Numerical",
+            "3SsnPorch": "Numerical",
+            "Alley": "OneHotEncoderDense",
+            "BedroomAbvGr": "Numerical",
+            "BldgType": "OneHotEncoderDense",
+            "BsmtCond": "OneHotEncoderDense",
+            "BsmtExposure": "OneHotEncoderDense",
+            "BsmtFinSF1": "Numerical",
+            "BsmtFinSF2": "Delete",
+            "BsmtFinType1": "OneHotEncoderDense",
+            "BsmtFinType2": "Delete",
+            "BsmtFullBath": "Numerical",
+            "BsmtHalfBath": "Numerical",
+            "BsmtQual": "OneHotEncoderDense",
+            "BsmtUnfSF": "Numerical",
+            "CentralAir": "OneHotEncoderDense",
+            "Condition1": "OneHotEncoderDense",
+            "Condition2": "Delete",
+            "Electrical": "OneHotEncoderDense",
+            "EnclosedPorch": "Numerical",
+            "ExterCond": "OneHotEncoderDense",
+            "ExterQual": "OneHotEncoderDense",
+            "Exterior1st": "OneHotEncoderDense",
+            "Exterior2nd": "Delete",
+            "Fence": "OneHotEncoderDense",
+            "FireplaceQu": "OneHotEncoderDense",
+            "Fireplaces": "Numerical",
+            "Foundation": "OneHotEncoderDense",
+            "FullBath": "Numerical",
+            "Functional": "OneHotEncoderDense",
+            "GarageArea": "Numerical",
+            "GarageCars": "Numerical",
+            "GarageCond": "OneHotEncoderDense",
+            "GarageFinish": "OneHotEncoderDense",
+            "GarageQual": "OneHotEncoderDense",
+            "GarageType": "OneHotEncoderDense",
+            "GarageYrBlt": "Numerical",
+            "GrLivArea": "Numerical",
+            "HalfBath": "Numerical",
+            "Heating": "OneHotEncoderDense",
+            "HeatingQC": "OneHotEncoderDense",
+            "HouseStyle": "OneHotEncoderDense",
+            "KitchenAbvGr": "Numerical",
+            "KitchenQual": "OneHotEncoderDense",
+            "LandContour": "OneHotEncoderDense",
+            "LandSlope": "OneHotEncoderDense",
+            "LotArea": "Numerical",
+            "LotConfig": "OneHotEncoderDense",
+            "LotFrontage": "Numerical",
+            "LotShape": "OneHotEncoderDense",
+            "LowQualFinSF": "Numerical",
+            "MSSubClass": "Special",
+            "MSZoning": "OneHotEncoderDense",
+            "MasVnrArea": "Numerical",
+            "MasVnrType": "OneHotEncoderDense",
+            "MiscFeature": "OneHotEncoderDense",
+            "MiscVal": "Delete",
+            "MoSold": "OneHotEncoderDense",
+            "Neighborhood": "OneHotEncoderDense",
+            "OpenPorchSF": "Numerical",
+            "OverallCond": "Numerical",
+            "OverallQual": "Numerical",
+            "PavedDrive": "OneHotEncoderDense",
+            "PoolArea": "Numerical",
+            "PoolQC": "OneHotEncoderDense",
+            "RoofMatl": "Delete",
+            "RoofStyle": "OneHotEncoderDense",
+            "SaleCondition": "OneHotEncoderDense",
+            "SalePrice": "y",
+            "SaleType": "OneHotEncoderDense",
+            "ScreenPorch": "Numerical",
+            "Street": "OneHotEncoderDense",
+            "TotRmsAbvGrd": "Numerical",
+            "TotalBsmtSF": "Numerical",
+            "Utilities": "Delete",
+            "WoodDeckSF": "Numerical",
+            "YearBuilt": "Numerical",
+            "YearRemodAdd": "Numerical",
+            "YrSold": "Numerical"
+        },
+        "dirtiness_type": {
+            "MSSubClass": "?"
+        }
+    },
+    "house_sales": {
+        "clf_type": "regression",
+        "col_action": {
+            "bathrooms": "Numerical",
+            "bedrooms": "Numerical",
+            "condition": "Numerical",
+            "date": "Delete",
+            "floors": "Numerical",
+            "grade": "Numerical",
+            "lat": "Delete",
+            "long": "Delete",
+            "price": "y",
+            "sqft_above": "Numerical",
+            "sqft_basement": "Numerical",
+            "sqft_living": "Numerical",
+            "sqft_living15": "Delete",
+            "sqft_lot": "Numerical",
+            "sqft_lot15": "Delete",
+            "view": "Numerical",
+            "waterfront": "Numerical",
+            "yr_built": "Numerical",
+            "yr_renovated": "Delete",
+            "zipcode": "Special"
+        },
+        "dirtiness_type": {
+            "zipcode": "zip code"
+        }
+    },
+    "indultos_espana": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "Año Fin Delito": "Numerical",
+            "Año Inicio Delito": "Numerical",
+            "Categoría Cod.Penal": "Special",
+            "Delito": "Delete",
+            "Fecha BOE": "Delete",
+            "Fecha BOE.año": "Numerical",
+            "Fecha BOE.día de la semana": "Numerical",
+            "Fecha BOE.día del mes": "Numerical",
+            "Fecha BOE.mes": "Numerical",
+            "Fecha Condena": "Delete",
+            "Fecha Condena.año": "Numerical",
+            "Fecha Condena.día de la semana": "Numerical",
+            "Fecha Condena.día del mes": "Numerical",
+            "Fecha Condena.mes": "Numerical",
+            "Fecha Indulto": "Delete",
+            "Fecha Indulto.año": "Numerical",
+            "Fecha Indulto.día de la semana": "Numerical",
+            "Fecha Indulto.día del mes": "Numerical",
+            "Fecha Indulto.mes": "Numerical",
+            "Género": "OneHotEncoderDense-1",
+            "Ministerio": "OneHotEncoderDense-1",
+            "Ministro": "OneHotEncoderDense",
+            "Partido en el Gobierno": "OneHotEncoderDense-1",
+            "Región": "OneHotEncoderDense",
+            "Rol en el delito": "OneHotEncoderDense",
+            "Subcategoría Cod.Penal": "Delete",
+            "Tipo de Indulto": "y",
+            "Tribunal": "OneHotEncoderDense"
+        },
+        "dirtiness_type": {
+            "Categoría Cod.Penal": "?"
+        }
+    },
+    "intrusion_detection": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "attack_type": "y",
+            "count": "Numerical",
+            "diff_srv_rate": "Numerical",
+            "dst_bytes": "Numerical",
+            "dst_host_count": "Numerical",
+            "dst_host_diff_srv_rate": "Numerical",
+            "dst_host_rerror_rate": "Numerical",
+            "dst_host_same_src_port_rate": "Numerical",
+            "dst_host_same_srv_rate": "Numerical",
+            "dst_host_serror_rate": "Numerical",
+            "dst_host_srv_count": "Numerical",
+            "dst_host_srv_diff_host_rate": "Numerical",
+            "dst_host_srv_rerror_rate": "Numerical",
+            "dst_host_srv_serror_rate": "Numerical",
+            "duration": "Numerical",
+            "flag": "OneHotEncoderDense",
+            "hot": "Numerical",
+            "is_guest_login": "OneHotEncoderDense",
+            "is_host_login": "OneHotEncoderDense",
+            "land": "OneHotEncoderDense",
+            "logged_in": "OneHotEncoderDense",
+            "num_access_files": "Numerical",
+            "num_compromised": "Numerical",
+            "num_failed_logins": "Numerical",
+            "num_file_creations": "Numerical",
+            "num_outbound_cmds": "Numerical",
+            "num_root": "Numerical",
+            "num_shells": "Numerical",
+            "protocol_type": "OneHotEncoderDense",
+            "rerror_rate": "Numerical",
+            "root_shell": "Numerical",
+            "same_srv_rate": "Numerical",
+            "serror_rate": "Numerical",
+            "service": "Special",
+            "src_bytes": "Numerical",
+            "srv_count": "Numerical",
+            "srv_diff_host_rate": "Numerical",
+            "srv_rerror_rate": "Numerical",
+            "srv_serror_rate": "Numerical",
+            "su_attempted": "Numerical",
+            "urgent": "Numerical",
+            "wrong_fragment": "Numerical"
+        },
+        "dirtiness_type": {
+            "service": "?"
+        }
+    },
+    "journal_influence": {
+        "clf_type": "regression",
+        "col_action": {
+            "avg_cites_per_paper": "y",
+            "journal_name": "Special"
+        },
+        "dirtiness_type": {
+            "journal_name": "Overlap"
+        }
+    },
+    "kickstarter_projects": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "Unnamed: 13": "Delete",
+            "Unnamed: 14": "Delete",
+            "Unnamed: 15": "Delete",
+            "Unnamed: 16": "Delete",
+            "backers ": "Delete",
+            "category ": "Special",
+            "country ": "Delete",
+            "currency ": "Delete",
+            "deadline ": "Delete",
+            "goal ": "Delete",
+            "launched ": "Delete",
+            "main_category ": "Delete",
+            "name ": "Delete",
+            "pledged ": "Delete",
+            "state ": "y",
+            "usd pledged ": "Numerical"
+        },
+        "dirtiness_type": {
+            "category ": "Overlap"
+        }
+    },
+    "medical_charge": {
+        "clf_type": "regression",
+        "col_action": {
+            "DRG Definition": "Special",
+            "Provider Id": "Delete",
+            "Provider Name": "Delete",
+            "Provider Street Address": "Delete",
+            "Provider City": "Delete",
+            "Provider State": "OneHotEncoderDense",
+            "Provider Zip Code": "Delete",
+            "Hospital Referral Region (HRR) Description": "Delete",
+            "Total Discharges": "Delete",
+            "Average Covered Charges": "Numerical",
+            "Average Total Payments": "y",
+            "Average Medicare Payments": "Delete"
+        },
+        "dirtiness_type": {
+            "DRG Definition": "Overlap"
+        }
+    },
+    "met_objects": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "Artist Alpha Sort": "Delete",
+            "Artist Begin Date": "Delete",
+            "Artist Display Bio": "Delete",
+            "Artist Display Name": "Delete",
+            "Artist End Date": "Delete",
+            "Artist Nationality": "Delete",
+            "Artist Prefix": "Delete",
+            "Artist Role": "Delete",
+            "Artist Suffix": "Delete",
+            "City": "Delete",
+            "Classification": "Delete",
+            "Country": "Delete",
+            "County": "Delete",
+            "Credit Line": "Delete",
+            "Culture": "Delete",
+            "Department": "y",
+            "Dimensions": "Delete",
+            "Dynasty": "Delete",
+            "Excavation": "Delete",
+            "Geography Type": "Delete",
+            "Is Highlight": "Delete",
+            "Is Public Domain": "Delete",
+            "Link Resource": "Delete",
+            "Locale": "Delete",
+            "Locus": "Delete",
+            "Medium": "Delete",
+            "Metadata Date": "Delete",
+            "Object Begin Date": "Delete",
+            "Object Date": "Delete",
+            "Object End Date": "Delete",
+            "Object ID": "Delete",
+            "Object Name": "Special",
+            "Object Number": "Delete",
+            "Period": "Delete",
+            "Portfolio": "Delete",
+            "Region": "Delete",
+            "Reign": "Delete",
+            "Repository": "Delete",
+            "Rights and Reproduction": "Delete",
+            "River": "Delete",
+            "State": "Delete",
+            "Subregion": "Delete",
+            "Title": "Delete"
+        },
+        "dirtiness_type": {
+            "Object Name": "Overlap; Description"
+        }
+    },
+    "midwest_survey": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "Age": "OneHotEncoderDense",
+            "Education": "OneHotEncoderDense",
+            "Gender": "OneHotEncoderDense",
+            "Household Income": "OneHotEncoderDense",
+            "Location (Census Region)": "y",
+            "In your own words, what would you call the part of the country you live in now?": "Special",
+            "How much, if at all, do you personally identify as a Midwesterner?": "Delete",
+            "Do you consider Illinois state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Indiana state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Iowa state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Kansas state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Michigan state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Minnesota state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Missouri state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Nebraska state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider North Dakota state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Ohio state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider South Dakota state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Wisconsin state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Arkansas state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Colorado state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Kentucky state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Oklahoma state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Pennsylvania state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider West Virginia state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Montana state as part of the Midwest?": "OneHotEncoderDense-1",
+            "Do you consider Wyoming state as part of the Midwest?": "OneHotEncoderDense-1",
+            "In what ZIP code is your home located? (enter 5-digit ZIP code; for example, 00544 or 94305)": "Delete"
+        },
+        "dirtiness_type": {
+            "In your own words, what would you call the part of the country you live in now?": "Open-ended; Typos"
+        }
+    },
+    "product_relevance": {
+        "clf_type": "regression",
+        "col_action": {
+            "id": "Delete",
+            "product_title": "Special",
+            "product_uid": "Delete",
+            "relevance": "y",
+            "search_term": "Special"
+        },
+        "dirtiness_type": {
+            "product_title": "?"
+        }
+    },
+    "public_procurement": {
+        "clf_type": "regression",
+        "col_action": {
+            "ADDITIONAL_CPVS": "Delete",
+            "AWARD_EST_VALUE_EURO": "Delete",
+            "AWARD_VALUE_EURO": "Delete",
+            "LOG_AWARD_VALUE_EURO": "y",
+            "AWARD_VALUE_EURO_FIN_1": "Delete",
+            "B_ACCELERATED": "Delete",
+            "B_AWARDED_BY_CENTRAL_BODY": "Delete",
+            "B_AWARDED_TO_A_GROUP": "Delete",
+            "B_CONTRACTOR_SME": "Delete",
+            "B_DYN_PURCH_SYST": "Delete",
+            "B_ELECTRONIC_AUCTION": "Delete",
+            "B_EU_FUNDS": "OneHotEncoderDense",
+            "B_FRA_AGREEMENT": "OneHotEncoderDense",
+            "B_FRA_CONTRACT": "Delete",
+            "B_GPA": "OneHotEncoderDense",
+            "B_INVOLVES_JOINT_PROCUREMENT": "Delete",
+            "B_MULTIPLE_CAE": "Delete",
+            "B_MULTIPLE_COUNTRY": "Delete",
+            "B_ON_BEHALF": "OneHotEncoderDense",
+            "B_SUBCONTRACTED": "Delete",
+            "CAE_ADDRESS": "Delete",
+            "CAE_NAME": "Special",
+            "CAE_NATIONALID": "Delete",
+            "CAE_POSTAL_CODE": "Delete",
+            "CAE_TOWN": "Delete",
+            "CAE_TYPE": "OneHotEncoderDense",
+            "CANCELLED": "Delete",
+            "CONTRACT_NUMBER": "Delete",
+            "CORRECTIONS": "Delete",
+            "CPV": "Delete",
+            "CRIT_CODE": "OneHotEncoderDense",
+            "CRIT_CRITERIA": "Delete",
+            "CRIT_PRICE_WEIGHT": "Delete",
+            "CRIT_WEIGHTS": "Delete",
+            "DT_AWARD": "Delete",
+            "DT_DISPATCH": "Delete",
+            "EU_INST_CODE": "OneHotEncoderDense",
+            "FRA_ESTIMATED": "Delete",
+            "ID_AWARD": "Delete",
+            "ID_LOT": "Delete",
+            "ID_LOT_AWARDED": "Delete",
+            "ID_NOTICE_CAN": "Delete",
+            "ID_TYPE": "OneHotEncoderDense",
+            "INFO_ON_NON_AWARD": "Delete",
+            "INFO_UNPUBLISHED": "Delete",
+            "ISO_COUNTRY_CODE": "OneHotEncoderDense",
+            "ISO_COUNTRY_CODE_ALL": "Delete",
+            "LOTS_NUMBER": "Numerical",
+            "MAIN_ACTIVITY": "OneHotEncoderDense",
+            "NUMBER_AWARDS": "Numerical",
+            "NUMBER_OFFERS": "Delete",
+            "NUMBER_OFFERS_ELECTR": "Delete",
+            "NUMBER_TENDERS_NON_EU": "Delete",
+            "NUMBER_TENDERS_OTHER_EU": "Delete",
+            "NUMBER_TENDERS_SME": "Delete",
+            "OUT_OF_DIRECTIVES": "Delete",
+            "TAL_LOCATION_NUTS": "Delete",
+            "TITLE": "Delete",
+            "TOP_TYPE": "OneHotEncoderDense",
+            "TYPE_OF_CONTRACT": "OneHotEncoderDense",
+            "VALUE_EURO": "Delete",
+            "VALUE_EURO_FIN_1": "Delete",
+            "VALUE_EURO_FIN_2": "Delete",
+            "WIN_ADDRESS": "Delete",
+            "WIN_COUNTRY_CODE": "OneHotEncoderDense",
+            "WIN_NAME": "Delete",
+            "WIN_NATIONALID": "Delete",
+            "WIN_POSTAL_CODE": "Delete",
+            "WIN_TOWN": "Delete",
+            "XSD_VERSION": "Delete",
+            "YEAR": "Delete"
+        },
+        "dirtiness_type": {
+            "CAE_NAME": "Open-ended"
+        }
+    },
+    "road_safety": {
+        "clf_type": "binary-clf",
+        "col_action": {
+            "Sex_of_Driver": "y",
+            "make": "OneHotEncoderDense",
+            "model": "Special"
+        },
+        "dirtiness_type": {
+            "model": "Overlap"
+        }
+    },
+    "traffic_violations": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "Accident": "Delete",
+            "Agency": "Delete",
+            "Alcohol": "OneHotEncoderDense-1",
+            "Arrest Type": "OneHotEncoderDense",
+            "Article": "Delete",
+            "Belts": "OneHotEncoderDense-1",
+            "Charge": "Delete",
+            "Color": "Delete",
+            "Commercial License": "OneHotEncoderDense-1",
+            "Commercial Vehicle": "OneHotEncoderDense-1",
+            "Contributed To Accident": "Delete",
+            "DL State": "Delete",
+            "Date Of Stop": "Delete",
+            "Description": "Special",
+            "Driver City": "Delete",
+            "Driver State": "Delete",
+            "Fatal": "OneHotEncoderDense-1",
+            "Gender": "OneHotEncoderDense",
+            "Geolocation": "Delete",
+            "HAZMAT": "OneHotEncoderDense",
+            "Latitude": "Delete",
+            "Location": "Delete",
+            "Longitude": "Delete",
+            "Make": "Delete",
+            "Model": "Delete",
+            "Personal Injury": "Delete",
+            "Property Damage": "OneHotEncoderDense-1",
+            "Race": "OneHotEncoderDense",
+            "State": "Delete",
+            "SubAgency": "Delete",
+            "Time Of Stop": "Delete",
+            "VehicleType": "Delete",
+            "Violation Type": "y",
+            "Work Zone": "OneHotEncoderDense-1",
+            "Year": "Numerical"
+        },
+        "dirtiness_type": {
+            "Description": "Description"
+        }
+    },
+    "vancouver_employee": {
+        "clf_type": "regression",
+        "col_action": {
+            "Department": "OneHotEncoderDense",
+            "Expenses": "Delete",
+            "Name": "Delete",
+            "Remuneration": "y",
+            "Title": "Special"
+        },
+        "dirtiness_type": {
+            "Title": "Overlap"
+        }
+    },
+    "wine_reviews": {
+        "clf_type": "regression",
+        "col_action": {
+            "country": "OneHotEncoderDense",
+            "description": "Special",
+            "designation": "Delete",
+            "points": "y",
+            "price": "Numerical",
+            "province": "Delete",
+            "region_1": "Delete",
+            "region_2": "Delete",
+            "variety": "Delete",
+            "winery": "Delete"
+        },
+        "dirtiness_type": {
+            "description": "Description"
+        }
+    },
+    "emobank": {
+        "clf_type": "regression",
+        "col_action": {
+            "V": "y",
+            "A": "Delete",
+            "D": "Delete",
+            "text": "Special"
+        },
+        "dirtiness_type": {
+            "description": "Open-ended"
+        }
+    },
+    "text_emotion": {
+        "clf_type": "multiclass-clf",
+        "col_action": {
+            "sentiment": "y",
+            "author": "Delete",
+            "content": "Special"
+        },
+        "dirtiness_type": {
+            "description": "Open-ended"
+        }
+    }
+
+}

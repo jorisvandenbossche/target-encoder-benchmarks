@@ -1,6 +1,7 @@
 import os
 
 from fit_predict_categorical_encoding import fit_predict_categorical_encoding
+from datasets import DATASETS as ALL_DATASETS
 
 
 # Parameters ##################################################################
@@ -12,6 +13,8 @@ datasets = [
     'random-n=100-zipf=2',
     # 'house_prices'
 ]
+
+datsets = ALL_DATASETS
 
 # Number of jobs for the folds (each model itself is run with n_jobs=1)
 n_jobs = 20
@@ -49,5 +52,4 @@ fit_predict_categorical_encoding(datasets=datasets,
                                  str_preprocess=str_preprocess,
                                  encoders=encoders, classifiers=classifiers,
                                  test_size=test_size, n_splits=n_splits,
-                                 n_jobs=n_jobs, results_path=results_path,
-                                 model_path='')
+                                 n_jobs=n_jobs, results_path=results_path)

@@ -1,4 +1,6 @@
 import os
+import glob
+import json
 import datetime
 import warnings
 from constants import sample_seed
@@ -6,18 +8,64 @@ from constants import sample_seed
 import numpy as np
 import pandas as pd
 
+# import datasets.src
+
 
 BENCHMARK_HOME = os.environ.get('BENCHMARK_HOME', '.')
+DATA_HOME = os.environ.get('BENCHMARK_DATA_HOME', '.')
+
+
+def _populate():
+
+    global DATASET_CLASSES
+    DATASET_CLASSES = {
+        'adult': AdultDataset,
+        'employee_salaries': EmployeeSalariesDataset,
+        'medical_charge': MedicalChargeDataset,
+        'journal_influence': JournalInfluenceDataset,
+        'met_objects': MetObjectsDataset,
+        'colleges': CollegesDataset,
+        'beer_reviews': BeerReviewsDataset,
+        # 'midwest_survey': MidwestSurveyDataset,
+        'traffic_violations': TrafficViolationsDataset,
+        'crime_data': CrimeDataDataset,
+        'public_procurement': PublicProcurementDataset,
+        'intrusion_detection': IntrusionDetectionDataset,
+        'emobank': EmobankDataset,
+        'text_emotion': TextEmotionDataset,
+        #
+        # 'indultos_espana': IndultosEspanaDataset,
+        'open_payments': OpenPaymentsDataset,
+        'road_safety': RoadSafetyDataset,
+        'consumer_complaints': ConsumerComplaintsDataset,
+        'product_relevance': ProductRelevanceDataset,
+        'federal_election': FederalElectionDataset,
+        'drug_directory': DrugDirectoryDataset,
+        # 'french_companies': FrenchCompaniesDataset,
+        'dating_profiles': DatingProfilesDataset,
+        'cacao_flavors': CacaoFlavorsDataset,
+        'wine_reviews': WineReviewsDataset,
+        'house_prices': HousePricesDataset,
+        'kickstarter_projects': KickstarterProjectsDataset,
+        'building_permits': BuildingPermitsDataset,
+        'california_housing': CaliforniaHousingDataset,
+        'house_sales': HouseSalesDataset,
+        'vancouver_employee': VancouverEmployeeDataset,
+        'firefighter_interventions': FirefighterInterventionsDataset,
+        #
+        'random-n=100-zipf=2': RandomDataset,
+    }
+
+    global DATASETS
+    DATASETS = sorted(DATASET_CLASSES.keys())
+
+
+dataset_config_file = os.path.join(BENCHMARK_HOME, 'datasets_config.json')
+with open(dataset_config_file, 'r') as f:
+    DATASET_CONFIG = json.load(f)
 
 
 def get_dataset(name):
-    DATASET_CLASSES = {
-        'employee_salaries': EmployeeSalariesDataset,
-        'medical_charge': MedicalChargeDataset,
-        'adult': AdultDataset,
-        'traffic_violations': TrafficViolationsDataset,
-        'random-n=100-zipf=2': RandomDataset,
-    }
     return DATASET_CLASSES[name]()
 
 
@@ -43,7 +91,7 @@ def get_data_folder():
     #     data_folder = '/storage/local/pcerda/data'
     # else:
     #     data_folder = os.path.join(CE_HOME, 'data')
-    data_folder = os.path.join(BENCHMARK_HOME, 'data')
+    data_folder = os.path.join(DATA_HOME, 'data')
     return data_folder
 
 
@@ -77,9 +125,12 @@ class Dataset:
                       if self.col_action[key] is not 'y']
         self.ycol = [key for key in self.col_action
                      if self.col_action[key] is 'y'][0]
+        self.special_column = [key for key in self.col_action
+                               if self.col_action[key] == 'Special'][0]
         for col in self.col_action:
             check_nan_percentage(self.df, col)
-            if self.col_action[col] in ['OneHotEncoderDense', 'Special']:
+            if self.col_action[col] in ['OneHotEncoderDense', 'OneHotEncoder',
+                                        'Special', 'OneHotEncoderDense-1']:
                 self.df = self.df.fillna(value={col: 'na'})
         self.df = self.df.dropna(
             axis=0, subset=[c for c in self.xcols if self.col_action[c]
@@ -133,8 +184,7 @@ class AdultDataset(Dataset):
     }
 
     def _set_paths(self):
-        data_path = os.path.join(get_data_folder(), 'adult_dataset')
-        create_folder(data_path, 'output/results')
+        data_path = os.path.join(get_data_folder(), 'adult')
         data_file = os.path.join(data_path, 'raw', 'adult.data')
         self.file = data_file
         self.path = data_path
@@ -198,7 +248,6 @@ class MedicalChargeDataset(Dataset):
 
     def _set_paths(self):
         data_path = os.path.join(get_data_folder(), 'medical_charge')
-        create_folder(data_path, 'output/results')
         data_file = os.path.join(
             data_path, 'raw',
             'Medicare_Provider_Charge_Inpatient_DRG100_FY2011.csv')
@@ -234,8 +283,8 @@ class EmployeeSalariesDataset(Dataset):
 
     def _set_paths(self):
         data_path = os.path.join(get_data_folder(), 'employee_salaries')
-        create_folder(data_path, 'output/results')
-        data_file = os.path.join(data_path, 'raw', 'rows.csv')
+        data_file = os.path.join(
+            data_path, 'raw', 'Employee_Salaries_-_2016.csv')
         self.file = data_file
         self.path = data_path
 
@@ -249,64 +298,182 @@ class EmployeeSalariesDataset(Dataset):
         self.df = df
 
 
-def float_to_int(col, index):
-    c = []
-    for elt in col:
-        try:
-            c.append(int(elt))
-        except ValueError as e:
-            c.append(np.nan)
-    return pd.Series(c, dtype=np.object, index=index)
+class JournalInfluenceDataset(Dataset):
+
+    name = 'journal_influence'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'journal_influence')
+        data_file = os.path.join(
+            data_path, 'raw', 'estimated-article-influence-scores-2015.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file)
+        df.drop(["Unnamed: 0"], 1, inplace=True)
+        cols = ['citation_count_sum', 'paper_count_sum']
+        for c in cols:
+            df[c] = float_to_int(df[c], df.index)
+        # df['journal_name'] = df['journal_name'].astype('category')
+        self.df = df
+
+
+class MetObjectsDataset(Dataset):
+
+    name = 'met_objects'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'met_objects')
+        data_file = os.path.join(
+            data_path, 'raw', 'MetObjects.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file, encoding='utf-8')
+        # cat_cols = ['Department', 'Dynasty', 'State']
+        clean = ['Geography Type', 'State', 'Classification', 'Artist Role',
+                 'Artist Prefix', 'Artist Display Bio',
+                 'Artist Suffix', 'Geography Type']
+
+        period = []
+        for c in df:
+            arr = []
+            for elt in df[c]:
+                if isinstance(elt, str) and '\r\n' in elt:
+                    elt = elt.replace('\r\n', '')
+                if isinstance(elt, str) and '\u3000' in elt:
+                    elt = elt.replace('\u3000', ' ')
+                if isinstance(elt, str) and '\x1e' in elt:
+                    elt = elt.replace('\x1e', '')
+                arr.append(elt)
+            df[c] = pd.Series(arr, dtype=df[c].dtype, index=df.index)
+
+        for c in df['Period']:
+            if type(c) is str:
+                period.append(c)
+            else:
+                period.append(np.nan)
+        df['Period'] = pd.Series(period, dtype=np.object, index=df.index)
+
+        for c in clean:
+            tab = []
+            for elt in df[c]:
+                if elt == '|' or elt == '||' or elt == '(none assigned)':
+                    tab.append(np.nan)
+                else:
+                    tab.append(elt)
+            df[c] = pd.Series(tab, dtype=np.object, index=df.index)
+
+        # for c in cat_cols:
+        #     df[c] = df[c].astype('category')')
+        self.df = df
+
+
+class CollegesDataset(Dataset):
+
+    name = 'colleges'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'colleges')
+        data_file = os.path.join(
+            data_path, 'raw', 'Colleges.txt')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+
+        def _clean_cols(cols, df):
+            for c in cols:
+                tab = []
+                if 'Predominant' in c:
+                    for elt in df[c]:
+                        if isinstance(elt, str) and 'None' in elt:
+                            tab.append(np.nan)
+                        else:
+                            tab.append(elt)
+                    df[c] = pd.Series(tab, dtype=np.object, index=df.index)
+                elif 'Mean Earnings' in c or 'Median Earnings' in c:
+                    for elt in df[c]:
+                        if isinstance(elt, str) and 'PrivacySuppressed' in elt:
+                            tab.append(np.nan)
+                        elif isinstance(elt, str):
+                            tab.append(int(elt))
+                        else:
+                            tab.append(elt)
+                    df[c] = pd.Series(tab, dtype=np.object, index=df.index)
+                elif df[c].dtype == float:
+                    df[c] = float_to_int(df[c], df.index)
+
+            return df
+
+        df = pd.read_csv(self.file, sep='\t', encoding='latin1',
+                         index_col='UNITID')
+        df.drop(["Unnamed: 0"], 1, inplace=True)
+        df['State'] = df['State'].astype(str)
+        cols = ['Undergrad Size', 'Predominant Degree',
+                'Average Cost Academic Year', 'Average Cost Program Year',
+                'Tuition (Instate)', 'Tuition (Out of state)',
+                'Spend per student', 'Faculty Salary',
+                'Mean Earnings 6 years', 'Median Earnings 6 years',
+                'Mean Earnings 10 years', 'Median Earnings 10 years']
+        df = _clean_cols(cols, df)
+
+        # cats = ['State', 'Predominant Degree', 'Highest Degree', 'Ownership',
+        #         'Region', 'ZIP']
+        # for c in cats:
+        #     df[c] = df[c].astype('category')
+        self.df = df
+
+
+class BeerReviewsDataset(Dataset):
+
+    name = 'beer_reviews'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'beer_reviews')
+        data_file = os.path.join(
+            data_path, 'raw', '"beer_reviews.csv"')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file)
+        for c in df:
+            arr = []
+            for elt in df[c]:
+                if isinstance(elt, str) and '\xa0' in elt:
+                    elt = elt.replace('\xa0', ' ')
+                arr.append(elt)
+            df[c] = pd.Series(arr, dtype=df[c].dtype, index=df.index)
+        self.df = df
+
+
+# class MidwestSurveyDataset(Dataset):
+
+#     name = 'midwest_survey'
+
+#     def _set_paths(self):
+#         data_path = os.path.join(get_data_folder(), 'midwest_survey')
+#         data_file = os.path.join(
+#             data_path, 'raw', 'MIDWEST.csv')
+#         self.file = data_file
+#         self.path = data_path
+
+#     def _get_df(self):
+#         df = pd.read_csv(self.file)
+
+#         self.df = df
 
 
 class TrafficViolationsDataset(Dataset):
 
     name = 'traffic_violations'
 
-    clf_type = "multiclass-clf"
-
-    col_action = {
-        "Accident": "Delete",
-        "Agency": "Delete",
-        "Alcohol": "OneHotEncoderDense-1",
-        "Arrest Type": "OneHotEncoderDense",
-        "Article": "Delete",
-        "Belts": "OneHotEncoderDense-1",
-        "Charge": "Delete",
-        "Color": "Delete",
-        "Commercial License": "OneHotEncoderDense-1",
-        "Commercial Vehicle": "OneHotEncoderDense-1",
-        "Contributed To Accident": "Delete",
-        "DL State": "Delete",
-        "Date Of Stop": "Delete",
-        "Description": "Special",
-        "Driver City": "Delete",
-        "Driver State": "Delete",
-        "Fatal": "OneHotEncoderDense-1",
-        "Gender": "OneHotEncoderDense",
-        "Geolocation": "Delete",
-        "HAZMAT": "OneHotEncoderDense",
-        "Latitude": "Delete",
-        "Location": "Delete",
-        "Longitude": "Delete",
-        "Make": "Delete",
-        "Model": "Delete",
-        "Personal Injury": "Delete",
-        "Property Damage": "OneHotEncoderDense-1",
-        "Race": "OneHotEncoderDense",
-        "State": "Delete",
-        "SubAgency": "Delete",
-        "Time Of Stop": "Delete",
-        "VehicleType": "Delete",
-        "Violation Type": "y",
-        "Work Zone": "OneHotEncoderDense-1",
-        "Year": "Numerical"
-    }
-
     def _set_paths(self):
         data_path = os.path.join(get_data_folder(), 'traffic_violations')
-        create_folder(data_path, 'output/results')
-        data_file = os.path.join(data_path, 'raw', 'rows.csv')
+        data_file = os.path.join(data_path, 'raw', 'Traffic_Violations.csv')
         self.file = data_file
         self.path = data_path
 
@@ -339,11 +506,609 @@ class TrafficViolationsDataset(Dataset):
         self.df = df
 
 
+class CrimeDataDataset(Dataset):
+
+    name = 'crime_data'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'crime_data')
+        data_file = os.path.join(
+            data_path, 'raw', 'Crime_Data_from_2010_to_Present.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file)
+        cols = ['Area Name', 'Victim Sex', 'Victim Descent',
+                'Premise Description',
+                'Weapon Description', 'Status Description',
+                'Crime Code Description']
+        df['Victim Age'] = float_to_int(df['Victim Age'], df.index)
+        df['Premise Code'] = float_to_int(df['Premise Code'], df.index)
+        df['Weapon Used Code'] = float_to_int(df['Weapon Used Code'], df.index)
+        df['Crime Code 1'] = float_to_int(df['Crime Code 1'], df.index)
+        df['Crime Code 2'] = float_to_int(df['Crime Code 2'], df.index)
+        df['Crime Code 3'] = float_to_int(df['Crime Code 3'], df.index)
+        df['Crime Code 4'] = float_to_int(df['Crime Code 4'], df.index)
+        for c in cols:
+            if df[c].dtype == float:
+                df[c] = float_to_int(df[c], df.index)
+            df[c] = df[c].astype('category')
+        self.df = df
+
+
+class PublicProcurementDataset(Dataset):
+
+    name = 'public_procurement'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'public_procurement')
+        data_file = os.path.join(
+            data_path, 'raw', 'TED_CAN_2015.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file)
+        col = 'AWARD_VALUE_EURO'
+        new_col = 'LOG_AWARD_VALUE_EURO'
+        df[new_col] = df[col].abs()
+        # Predicting the log of the ammount
+        df[new_col] = df[new_col].apply(np.log)
+        df = df[df[new_col] > 0]
+
+        for c in df:
+            arr = []
+            for elt in df[c]:
+                if isinstance(elt, str) and '\xa0' in elt:
+                    elt = elt.replace('\xa0', ' ')
+                arr.append(elt)
+            df[c] = pd.Series(arr, dtype=df[c].dtype, index=df.index)
+        self.df = df
+
+
+class IntrusionDetectionDataset(Dataset):
+
+    name = 'intrusion_detection'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'intrusion_detection')
+        data_file = os.path.join(
+            data_path, 'raw', 'kddcup.data_10_percent')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        col_names = [
+            'duration', 'protocol_type', 'service', 'flag', 'src_bytes',
+            'dst_bytes', 'land', 'wrong_fragment', 'urgent', 'hot',
+            'num_failed_logins', 'logged_in', 'num_compromised',
+            'root_shell', 'su_attempted', 'num_root', 'num_file_creations',
+            'num_shells', 'num_access_files', 'num_outbound_cmds',
+            'is_host_login', 'is_guest_login', 'count', 'srv_count',
+            'serror_rate', 'srv_serror_rate', 'rerror_rate',
+            'srv_rerror_rate', 'same_srv_rate', 'diff_srv_rate',
+            'srv_diff_host_rate', 'dst_host_count', 'dst_host_srv_count',
+            'dst_host_same_srv_rate', 'dst_host_diff_srv_rate',
+            'dst_host_same_src_port_rate', 'dst_host_srv_diff_host_rate',
+            'dst_host_serror_rate', 'dst_host_srv_serror_rate',
+            'dst_host_rerror_rate', 'dst_host_srv_rerror_rate',
+            'attack_type']
+        df = pd.read_csv(self.file, header=None, names=col_names)
+        for c in df:
+            arr = []
+            for elt in df[c]:
+                if isinstance(elt, str) and '\xa0' in elt:
+                    elt = elt.replace('\xa0', ' ')
+                arr.append(elt)
+            df[c] = pd.Series(arr, dtype=df[c].dtype, index=df.index)
+        self.df = df
+
+
+class EmobankDataset(Dataset):
+
+    name = 'emobank'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'emobank')
+        data_file = os.path.join(
+            data_path, 'raw', 'emobank.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file, index_col='id')
+        self.df = df
+
+
+class TextEmotionDataset(Dataset):
+
+    name = 'text_emotion'
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'text_emotion')
+        data_file = os.path.join(
+            data_path, 'raw', 'text_emotion.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df = pd.read_csv(self.file, index_col='tweet_id')
+        self.df = df
+
+
+def float_to_int(col, index):
+    c = []
+    for elt in col:
+        try:
+            c.append(int(elt))
+        except ValueError:
+            c.append(np.nan)
+    return pd.Series(c, dtype=np.object, index=index)
+
+
+# -----------------------------------------------------------------------------
+
+
+# class IndultosEspanaDataset(Dataset):
+
+#     name = "indultos_espana"
+
+#     def _set_paths(self):
+#         data_path = os.path.join(get_data_folder(),
+#                                  'bigml', 'Indultos_en_Espana_1996-2013')
+#         data_file = os.path.join(data_path, 'raw',
+#                                  'Indultos_en_Espana_1996-2013.csv')
+#         self.file = data_file
+#         self.path = data_path
+
+#     def _get_df(self):
+#         self.df = pd.read_csv(self.file)
+
+
+class OpenPaymentsDataset(Dataset):
+
+    name = "open_payments"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'docs_payments')
+        data_file = os.path.join(data_path, 'output', 'DfD.h5')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        # Variable names in Dollars for Docs dataset ######################
+        pi_specialty = ['Physician_Specialty']
+        drug_nm = ['Name_of_Associated_Covered_Drug_or_Biological1']
+        dev_nm = ['Name_of_Associated_Covered_Device_or_Medical_Supply1']
+        corp = ['Applicable_Manufacturer_or_Applicable_GPO_Making_' +
+                'Payment_Name']
+        amount = ['Total_Amount_of_Payment_USDollars']
+        dispute = ['Dispute_Status_for_Publication']
+        ###################################################################
+
+        if os.path.exists(self.file):
+            df = pd.read_hdf(self.file)
+            # print('Loading DataFrame from:\n\t%s' % self.file)
+        else:
+            hdf_files = glob.glob(os.path.join(self.path, 'hdf', '*.h5'))
+            hdf_files_ = []
+            for file_ in hdf_files:
+                if 'RSRCH_PGYR2013' in file_:
+                    hdf_files_.append(file_)
+                if 'GNRL_PGYR2013' in file_:
+                    hdf_files_.append(file_)
+
+            dfd_cols = pi_specialty + drug_nm + dev_nm + corp + amount + \
+                dispute
+            df_dfd = pd.DataFrame(columns=dfd_cols)
+            for hdf_file in hdf_files_:
+                if 'RSRCH' in hdf_file:
+                    with pd.HDFStore(hdf_file) as hdf:
+                        for key in hdf.keys():
+                            df = pd.read_hdf(hdf_file, key)
+                            df = df[dfd_cols]
+                            df['status'] = 'allowed'
+                            df = df.drop_duplicates(keep='first')
+                            df_dfd = pd.concat([df_dfd, df],
+                                               ignore_index=True)
+                            print('size: %d, %d' % tuple(df_dfd.shape))
+            unique_vals = {}
+            for col in df_dfd.columns:
+                unique_vals[col] = set(list(df_dfd[col].unique()))
+
+            for hdf_file in hdf_files_:
+                if 'GNRL' in hdf_file:
+                    with pd.HDFStore(hdf_file) as hdf:
+                        for key in hdf.keys():
+                            df = pd.read_hdf(hdf_file, key)
+                            df = df[dfd_cols]
+                            df['status'] = 'disallowed'
+                            df = df.drop_duplicates(keep='first')
+                            df_dfd = pd.concat([df_dfd, df],
+                                               ignore_index=True)
+                            print('size: %d, %d' % tuple(df_dfd.shape))
+            df_dfd = df_dfd.drop_duplicates(keep='first')
+            df_dfd.to_hdf(self.file, 't1')
+            df = df_dfd
+        df['status'] = (df['status'] == 'allowed')
+        self.df = df
+        # print_unique_values(df)
+        self.col_action = {
+            pi_specialty[0]: 'Delete',
+            drug_nm[0]: 'Delete',
+            dev_nm[0]: 'Delete',
+            corp[0]: 'Special',
+            amount[0]: 'Numerical',
+            dispute[0]: 'OneHotEncoderDense-1',
+            'status': 'y'}
+        self.dirtiness_type = {
+            corp[0]: 'Synonyms; Overlap'
+            }
+        self.clf_type = 'binary'
+
+
+class RoadSafetyDataset(Dataset):
+    '''Source: https://data.gov.uk/dataset/road-accidents-safety-data
+    '''
+
+    name = "road_safety"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'road_safety')
+        data_file = [os.path.join(data_path, 'raw', '2015_Make_Model.csv'),
+                     os.path.join(data_path, 'raw', 'Accidents_2015.csv'),
+                     os.path.join(data_path, 'raw', 'Casualties_2015.csv'),
+                     os.path.join(data_path, 'raw', 'Vehicles_2015.csv')]
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        files = self.file
+        for filename in files:
+            if filename.split('/')[-1] == '2015_Make_Model.csv':
+                df_mod = pd.read_csv(filename, low_memory=False)
+                df_mod['Vehicle_Reference'] = (df_mod['Vehicle_Reference']
+                                               .map(str))
+                df_mod['Vehicle_Index'] = (df_mod['Accident_Index'] +
+                                           df_mod['Vehicle_Reference'])
+                df_mod = df_mod.set_index('Vehicle_Index')
+                df_mod = df_mod.dropna(axis=0, how='any', subset=['make'])
+        # for filename in files:
+        #     if filename.split('/')[-1] == 'Accidents_2015.csv':
+        #        df_acc = pd.read_csv(filename).set_index('Accident_Index')
+        for filename in files:
+            if filename.split('/')[-1] == 'Vehicles_2015.csv':
+                df_veh = pd.read_csv(filename)
+                df_veh['Vehicle_Reference'] = (df_veh['Vehicle_Reference']
+                                               .map(str))
+                df_veh['Vehicle_Index'] = (df_veh['Accident_Index'] +
+                                           df_veh['Vehicle_Reference'])
+                df_veh = df_veh.set_index('Vehicle_Index')
+        for filename in files:
+            if filename.split('/')[-1] == 'Casualties_2015.csv':
+                df_cas = pd.read_csv(filename)
+                df_cas['Vehicle_Reference'] = (df_cas['Vehicle_Reference']
+                                               .map(str))
+                df_cas['Vehicle_Index'] = (df_cas['Accident_Index'] +
+                                           df_cas['Vehicle_Reference'])
+                df_cas = df_cas.set_index('Vehicle_Index')
+
+        df = df_cas.join(df_mod, how='left', lsuffix='_cas',
+                         rsuffix='_model')
+        df = df.dropna(axis=0, how='any', subset=['make'])
+        df = df[df['Sex_of_Driver'] != 3]
+        df = df[df['Sex_of_Driver'] != -1]
+        df['Sex_of_Driver'] = df['Sex_of_Driver'] - 1
+        self.df = df
+        # col_action = {'Casualty_Severity': 'y',
+        #               'Casualty_Class': 'Numerical',
+        #               'make': 'OneHotEncoderDense',
+        #               'model': 'Special'}
+        self.file = self.file[0]
+
+
+class ConsumerComplaintsDataset(Dataset):
+    '''Source: https://catalog.data.gov/dataset/
+                       consumer-complaint-database
+               Documentation: https://cfpb.github.io/api/ccdb//fields.html'''
+
+    name = "consumer_complaints"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'consumer_complaints')
+        data_file = os.path.join(data_path, 'raw',
+                                 'Consumer_Complaints.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+        self.df = self.df.dropna(
+            axis=0, how='any', subset=['Consumer disputed?'])
+        self.df.loc[:, 'Consumer disputed?'] = (
+            self.df['Consumer disputed?'] == 'Yes')
+
+
+class ProductRelevanceDataset(Dataset):
+
+    name = "product_relevance"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'product_relevance')
+        data_file = os.path.join(data_path, 'raw', 'train.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, encoding='latin1')
+
+
+class FederalElectionDataset(Dataset):
+    '''Source: https://classic.fec.gov/finance/disclosure/
+                       ftpdet.shtml#a2011_2012'''
+
+    name = "federal_election"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'federal_election')
+        data_file = os.path.join(data_path, 'raw', 'itcont.txt')
+        self.data_dict_file = os.path.join(data_path, 'data_dict.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        df_dict = pd.read_csv(self.data_dict_file)
+        self.df = pd.read_csv(self.file, sep='|', encoding='latin1',
+                              header=None, names=df_dict['Column Name'])
+        # Some donations are negative
+        self.df['TRANSACTION_AMT'] = self.df['TRANSACTION_AMT'].abs()
+        # Predicting the log of the donation
+        self.df['TRANSACTION_AMT'] = self.df[
+            'TRANSACTION_AMT'].apply(np.log)
+        self.df = self.df[self.df['TRANSACTION_AMT'] > 0]
+
+
+class DrugDirectoryDataset(Dataset):
+    '''Source:
+            https://www.fda.gov/Drugs/InformationOnDrugs/ucm142438.htm'''
+
+    name = "drug_directory"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'drug_directory')
+        data_file = os.path.join(data_path, 'raw', 'product.txt')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, sep='\t', encoding='latin1')
+
+
+# class FrenchCompaniesDataset(Dataset):
+
+#     name = "french_companies"
+
+#     def _set_paths(self):
+#         data_path = os.path.join(get_data_folder(), 'french_companies')
+#         data_file = [os.path.join(data_path, 'raw',
+#                                   'datasets', 'chiffres-cles-2017.csv'),
+#                      os.path.join(data_path, 'raw',
+#                                   'datasets', 'avis_attribution_2017.csv')]
+#         self.file = data_file
+#         self.path = data_path
+
+#     def _get_df(self):
+#         pass
+
+
+class DatingProfilesDataset(Dataset):
+
+    name = "dating_profiles"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'dating_profiles')
+        data_file = os.path.join(data_path, 'raw', 'profiles.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+
+
+class CacaoFlavorsDataset(Dataset):
+    '''Source: https://www.kaggle.com/rtatman/chocolate-bar-ratings/'''
+
+    name = "cacao_flavors"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'cacao_flavors')
+        data_file = os.path.join(data_path, 'raw', 'flavors_of_cacao.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+        self.df['Cocoa\nPercent'] = self.df[
+            'Cocoa\nPercent'].astype(str).str[:-1].astype(float)
+
+
+class WineReviewsDataset(Dataset):
+    '''Source: https://www.kaggle.com/zynicide/wine-reviews/home'''
+
+    name = "wine_reviews"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'wine_reviews')
+        data_file = os.path.join(
+            data_path, 'raw', 'winemag-data_first150k.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+
+
+class HousePricesDataset(Dataset):
+    '''Source: https://www.kaggle.com/c/
+            house-prices-advanced-regression-techniques/data'''
+
+    name = "house_prices"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'house_prices')
+        data_file = os.path.join(data_path, 'raw', 'train.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, index_col=0)
+        # Identifies the type of dwelling involved in the sale.
+        MSSubClass = {
+            20:	'1-STORY 1946 & NEWER ALL STYLES',
+            30:	'1-STORY 1945 & OLDER',
+            40:	'1-STORY W/FINISHED ATTIC ALL AGES',
+            45:	'1-1/2 STORY - UNFINISHED ALL AGES',
+            50:	'1-1/2 STORY FINISHED ALL AGES',
+            60:	'2-STORY 1946 & NEWER',
+            70:	'2-STORY 1945 & OLDER',
+            75:	'2-1/2 STORY ALL AGES',
+            80:	'SPLIT OR MULTI-LEVEL',
+            85:	'SPLIT FOYER',
+            90:	'DUPLEX - ALL STYLES AND AGES',
+            120: '1-STORY PUD (Planned Unit Development) - 1946 & NEWER',
+            150: '1-1/2 STORY PUD - ALL AGES',
+            160: '2-STORY PUD - 1946 & NEWER',
+            180: 'PUD - MULTILEVEL - INCL SPLIT LEV/FOYER',
+            190: '2 FAMILY CONVERSION - ALL STYLES AND AGES',
+            }
+        for key, value in MSSubClass.items():
+            self.df.replace({'MSSubClass': key}, value, inplace=True)
+
+
+class KickstarterProjectsDataset(Dataset):
+    '''Source: https://www.kaggle.com/kemical/kickstarter-projects'''
+
+    name = "kickstarter_projects"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'kickstarter_projects')
+        data_file = os.path.join(
+            data_path, 'raw', 'ks-projects-201612.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, encoding='latin1', index_col=0)
+        self.df = self.df[self.df['state '].isin(['failed', 'successful'])]
+        self.df['state '] = (self.df['state '] == 'successful')
+        self.df['usd pledged '] = (
+            self.df['usd pledged '].astype(float) + 1E-10).apply(np.log)
+
+
+class BuildingPermitsDataset(Dataset):
+    '''Source:
+            https://www.kaggle.com/chicago/chicago-building-permits'''
+
+    name = "building_permits"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'building_permits')
+        data_file = os.path.join(data_path, 'raw', 'building-permits.csv.zip')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+        self.df.columns = self.df.columns.str.strip()
+        self.df['ESTIMATED_COST'] = (
+            self.df['ESTIMATED_COST'].astype(float) + 1E-10).apply(np.log)
+
+
+class CaliforniaHousingDataset(Dataset):
+    '''Source:
+    https://github.com/ageron/handson-ml/tree/master/datasets/housing
+    '''
+
+    name = "california_housing"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'california_housing')
+        data_file = os.path.join(data_path, 'raw', 'housing.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file)
+
+
+class HouseSalesDataset(Dataset):
+    '''Source: https://www.kaggle.com/harlfoxem/housesalesprediction'''
+
+    name = "house_sales"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'house_sales')
+        data_file = os.path.join(data_path, 'raw', 'kc_house_data.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, index_col=0)
+
+
+class VancouverEmployeeDataset(Dataset):
+    '''Source: https://data.vancouver.ca/datacatalogue/
+    employeeRemunerationExpensesOver75k.htm
+
+    Remuneration and Expenses for Employees Earning over $75,000
+    '''
+
+    name = "vancouver_employee"
+
+    def _set_paths(self):
+        data_path = os.path.join(get_data_folder(), 'vancouver_employee')
+        data_file = os.path.join(
+            data_path, 'raw',
+            '2017StaffRemunerationOver75KWithExpenses.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, header=3)
+        self.df['Remuneration'] = self.df[
+            'Remuneration'].apply(
+                lambda x: np.log(float(''.join(str(x).split(',')))))
+
+
+class FirefighterInterventionsDataset(Dataset):
+    '''Source:
+    https://www.data.gouv.fr/fr/datasets/interventions-des-pompiers/
+    '''
+
+    name = "firefighter_interventions"
+
+    def _set_paths(self):
+        data_path = os.path.join(
+            get_data_folder(), 'firefighter_interventions')
+        data_file = os.path.join(
+            data_path, 'raw', 'interventions-hebdo-2010-2017.csv')
+        self.file = data_file
+        self.path = data_path
+
+    def _get_df(self):
+        self.df = pd.read_csv(self.file, sep=';')
+
+
+# -----------------------------------------------------------------------------
+
+
 class RandomDataset(Dataset):
 
     name = 'random-n=100-zipf=2'
 
     clf_type = 'binary-clf'
+    col_action = None
 
     def __init__(self):
         pass
@@ -455,3 +1220,11 @@ def make_classification_categorical(
     X = np.concatenate(feats, axis=1)
 
     return X, y
+
+
+_populate()
+
+for name in DATASETS:
+    if not hasattr(DATASET_CLASSES[name], 'col_action'):
+        DATASET_CLASSES[name].col_action = DATASET_CONFIG[name]["col_action"]
+        DATASET_CLASSES[name].clf_type = DATASET_CONFIG[name]["clf_type"]
