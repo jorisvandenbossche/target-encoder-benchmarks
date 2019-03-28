@@ -6,8 +6,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_array
 
 
-def lambda_(n, n_avg):
-    out = n / (n + n_avg)
+def lambda_(n, m):
+    out = n / (n + m)
     return out
 
 
@@ -72,7 +72,8 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                  clf_type='binary-clf',
                  dtype=np.float64, handle_unknown='error',
                  shrinkage='bayes',
-                 n_min_half=1, f=1.0):
+                 n_min_half=1, f=1.0,
+                 bayes_m=1):
         self.categories = categories
         self.dtype = dtype
         self.clf_type = clf_type
@@ -80,6 +81,7 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
         self.shrinkage = shrinkage
         self.n_min_half = n_min_half
         self.f = f
+        self.bayes_m = bayes_m
 
     def fit(self, X, y):
         """Fit the TargetEncoder to X.
@@ -206,7 +208,11 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                         Eyx = self.Eyx_[j][x]
                     n = self.counter_[j][x]
                     if self.shrinkage == 'bayes':
-                        lambda_n = lambda_(n, self.n/self.k[j])
+                        if self.bayes_m == 1:
+                            m = 1
+                        elif self.bayes_m == 'n_avg':
+                            m = self.n/self.k[j]
+                        lambda_n = lambda_(n, m)
                     elif self.shrinkage == 'exponential':
                         lambda_n = lambda_exponential(n, self.n_min_half,
                                                       self.f)

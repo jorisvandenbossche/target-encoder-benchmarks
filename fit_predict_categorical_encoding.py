@@ -231,11 +231,20 @@ def get_column_action(col_action, xcols, encoder, clf_type):
                 clf_type=clf_type, handle_unknown='ignore'),
         'TargetEncoder-shrinkage=bayes':
             target_encoder.TargetEncoder(
-                clf_type=clf_type, handle_unknown='ignore', shrinkage='bayes'),
+                clf_type=clf_type, handle_unknown='ignore', shrinkage='bayes',
+                bayes_m='n_avg'),
+        'TargetEncoder-shrinkage=bayes_1':
+            target_encoder.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore', shrinkage='bayes',
+                bayes_m=1),
         'TargetEncoder-shrinkage=exp_1_1':
             target_encoder.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore',
                 shrinkage='exponential', n_min_half=1, f=1.0),
+        'TargetEncoder-shrinkage=exp_5_1':
+            target_encoder.TargetEncoder(
+                clf_type=clf_type, handle_unknown='ignore',
+                shrinkage='exponential', n_min_half=5, f=1.0),
         'TargetEncoder-dirty_cat':
             dirty_cat.TargetEncoder(
                 clf_type=clf_type, handle_unknown='ignore'),
