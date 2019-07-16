@@ -93,3 +93,80 @@ Overview of initial runs of the benchmark are in [overview_results.ipynb](overvi
 
 
 Benchmark code based on the provided code by Patricio Cerda et al (2018): https://arxiv.org/pdf/1806.00979.pdf (*"Similarity encoding for learning with dirty categorical variables"*).
+
+
+## Literature review
+
+
+What we are describing here as "target encoding" is also known as *likelihood encoding*, *impact coding* or *effect coding*.
+
+https://datascience.stackexchange.com/questions/11024/encoding-categorical-variables-using-likelihood-estimation
+
+Calculating the statistics naively, you will get a biased estimate and risk on overfitting. Several methods to prevent this have been described
+
+
+
+
+Other implementation:
+
+- Implementations in Python are listed above
+- Implementations in R:
+  - `vtreat` (https://github.com/WinVector/vtreat, https://winvector.github.io/vtreat/index.html)
+
+
+
+
+https://datascience.stackexchange.com/questions/11024/encoding-categorical-variables-using-likelihood-estimation
+
+Win-vector blog:
+- http://www.win-vector.com/blog/2012/07/modeling-trick-impact-coding-of-categorical-variables-with-many-levels/
+- http://www.win-vector.com/blog/2012/08/a-bit-more-on-impact-coding/
+- http://www.win-vector.com/blog/2014/02/bad-bayes-an-example-of-why-you-need-hold-out-testing/
+- http://www.win-vector.com/blog/2017/09/custom-level-coding-in-vtreat
+
+https://stats.stackexchange.com/questions/52132/how-to-do-regression-with-effect-coding-instead-of-dummy-coding-in-r
+
+https://www.kaggle.com/tnarik/likelihood-encoding-of-categorical-features
+
+**vtreat**
+- https://github.com/WinVector/vtreat
+- https://winvector.github.io/vtreat/index.html
+- Implementation: https://github.com/WinVector/vtreat/blob/master/R/effectTreatmentN.R
+ -> try out with example data to understand what it is doing !!
+- paper! https://arxiv.org/pdf/1611.09477.pdf
+
+**catboost**
+
+- https://catboost.ai/docs/concepts/algorithm-main-stages_cat-to-numberic.html
+- unclear what their prior exactly is 
+
+https://en.wikipedia.org/wiki/Bayesian_average
+https://stackoverflow.com/questions/34314277/what-should-be-taken-as-m-in-m-estimate-of-probability-in-naive-bayes
+
+https://github.com/Dpananos/Categorical-Features
+
+
+Possible data:
+- http://files.grouplens.org/papers/ml-10m-README.html
+- OpenML benchmarking suite:
+  - https://arxiv.org/pdf/1708.03731.pdf
+  - https://www.openml.org/s/99/data
+  - https://www.openml.org/s/14
+  - https://www.openml.org/s/144
+  - https://www.openml.org/s/34/data
+  - https://docs.openml.org/benchmark/
+- OpenML datasets:
+  - https://www.openml.org/d/40753
+  - https://www.openml.org/d/4534
+  - https://www.openml.org/d/1218
+
+
+
+
+http://varianceexplained.org/r/empirical-bayes-book/
+http://varianceexplained.org/r/simulation-bayes-baseball/
+http://varianceexplained.org/statistics/beta_distribution_and_baseball/
+http://varianceexplained.org/r/empirical_bayes_baseball/
+http://varianceexplained.org/r/hierarchical_bayes_baseball/
+https://en.wikipedia.org/wiki/Empirical_Bayes_method
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2872278/

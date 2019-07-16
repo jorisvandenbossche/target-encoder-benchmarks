@@ -225,7 +225,16 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
                 x_out = np.zeros((len(X[:, j]), len(self.classes_)))
                 lambda_n = {x: 0 for x in unqX}
                 for x in unqX:
-                    lambda_n[x] = lambda_(self.counter_[j][x], self.n/self.k[j])
+                    n = self.counter_[j][x]
+                    if self.shrinkage == 'bayes':
+                        if self.bayes_m == 1:
+                            m = 1
+                        elif self.bayes_m == 'n_avg':
+                            m = self.n/self.k[j]
+                        lambda_n[x] = lambda_(n, m)
+                    elif self.shrinkage == 'exponential':
+                        lambda_n[x] = lambda_exponential(n, self.n_min_half,
+                                                         self.f)
                 for k, c in enumerate(np.unique(self.classes_)):
                     for x in unqX:
                         if x not in cats:
